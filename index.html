@@ -444,17 +444,17 @@
             </div>
             <div class="field-row">
                 <div class="field-group">
-                    <label>Contact Person <span class="required-star">*</span></label>
+                    <label>Contact Person</label>
                     <input type="text" id="contactPerson">
                 </div>
                 <div class="field-group">
-                    <label>Contact Number <span class="required-star">*</span></label>
+                    <label>Contact Number</label>
                     <input type="tel" id="contactNumber" placeholder="e.g. 07700 900123">
                 </div>
             </div>
             <div class="field-row">
                 <div class="field-group">
-                    <label>Contact Person Email <span class="required-star">*</span></label>
+                    <label>Contact Person Email</label>
                     <input type="email" id="contactEmail">
                 </div>
             </div>
@@ -617,7 +617,6 @@
         <div class="section-body">
             <div class="field-row">
                 <div class="field-group"><label>Plumbers' Full Name <span class="required-star">*</span></label><input type="text" id="plumberName"></div>
-                <div class="field-group"><label>Plumbers Licence No. <span class="required-star">*</span></label><input type="text" id="plumberLicence"></div>
                 <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="signDate"></div>
             </div>
             <p style="font-size:11px;color:#888;margin-top:4px;font-style:italic">
@@ -683,12 +682,22 @@ document.addEventListener('change', function(e) {
     }
 });
 
+// Set default signature date to today
+function setDefaultSignDate() {
+    const signDate = document.getElementById('signDate');
+    if (signDate && !signDate.value) {
+        signDate.value = new Date().toISOString().slice(0, 10);
+    }
+}
+setDefaultSignDate();
+
 function clearForm() {
     document.getElementById('tmvForm').reset();
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('passFail').value = '';
     document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
     document.getElementById('validationMsg').style.display = 'none';
+    setDefaultSignDate();
     showToast('Form cleared');
 }
 
@@ -728,11 +737,8 @@ function validateForm() {
     // ── Site Details ──
     reqField('establishment', 'Name of Establishment');
     reqField('streetAddress', 'Street Address');
-    reqField('contactPerson', 'Contact Person');
-    reqField('contactNumber', 'Contact Number');
-    reqField('contactEmail', 'Contact Person Email');
 
-    // Email format check
+    // Email format check (optional but validated if provided)
     const emailEl = document.getElementById('contactEmail');
     if (emailEl && emailEl.value.trim()) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -765,7 +771,6 @@ function validateForm() {
 
     // ── Plumber Sign-off ──
     reqField('plumberName', "Plumber's Full Name");
-    reqField('plumberLicence', 'Plumber Licence No.');
     reqField('signDate', 'Sign-off Date');
 
     // Show/hide validation message
@@ -837,7 +842,6 @@ function collectFormData() {
         nextServiceDate: val('nextServiceDate'),
         comments: val('comments'),
         plumberName: val('plumberName'),
-        plumberLicence: val('plumberLicence'),
         signDate: val('signDate')
     };
 }
@@ -1071,10 +1075,9 @@ function generatePDF(returnBlob = false) {
 
     // ── LICENSED PLUMBERS SIGNATURE ──
     sectionHeader('LICENSED PLUMBERS SIGNATURE');
-    const thw = cw / 3;
+    const thw = cw / 2;
     fieldBox(ml, y, thw, 9, "Plumbers' Full Name", d.plumberName);
-    fieldBox(ml + thw, y, thw, 9, 'Plumbers Licence No.', d.plumberLicence);
-    fieldBox(ml + thw*2, y, thw, 9, 'Date', formatDate(d.signDate));
+    fieldBox(ml + thw, y, thw, 9, 'Date', formatDate(d.signDate));
     y += 12;
 
     doc.setFont('helvetica', 'normal');
@@ -1288,10 +1291,6 @@ function buildEmailHTML(d) {
                     <td style="padding:10px 16px;font-weight:bold;">${v(d.plumberName)}</td>
                 </tr>
                 <tr>
-                    <td style="padding:10px 16px;color:#666;border-top:1px solid #eee;">Licence No.</td>
-                    <td style="padding:10px 16px;border-top:1px solid #eee;">${v(d.plumberLicence)}</td>
-                </tr>
-                <tr>
                     <td style="padding:10px 16px;color:#666;border-top:1px solid #eee;">Date Signed</td>
                     <td style="padding:10px 16px;border-top:1px solid #eee;">${formatDate(d.signDate) || dash}</td>
                 </tr>
@@ -1341,7 +1340,7 @@ async function generateAndEmail() {
         emailjs.init(publicKey);
 
         const d = collectFormData();
-        const subject = `TMV Report - ${d.establishment || 'No Establishment'} - ${new Date().toLocaleDateString('en-GB')}`;
+        const subject = `TMV Commissioning Report - ${d.establishment || 'Unknown'} - ${new Date().toLocaleDateString('en-GB')}`;
         const htmlBody = buildEmailHTML(d);
 
         await emailjs.send(serviceId, templateId, {
