@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTA Electrical &amp; Mechanical — Form Filling Service</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        /* ── Navigation ── */
+        .navbar {
+            background: #1a1a2e;
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .navbar .subtitle {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+
+        /* ── Main Layout ── */
+        .main-container {
+            max-width: 900px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
+
+        /* ── Form Selector ── */
+        .form-selector {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .form-selector h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #444;
+        }
+        .form-cards {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .form-card {
+            flex: 1;
+            min-width: 200px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+        .form-card:hover { border-color: #4a6cf7; background: #f0f4ff; }
+        .form-card.active { border-color: #4a6cf7; background: #eef2ff; box-shadow: 0 0 0 3px rgba(74,108,247,0.15); }
+        .form-card h3 { font-size: 14px; margin-bottom: 4px; }
+        .form-card p { font-size: 12px; color: #888; }
+
+        /* ── Form Container ── */
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* ── Section Headers ── */
+        .section-header {
+            background: #1a1a2e;
+            color: white;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .section-body {
+            padding: 16px 20px;
+        }
+
+        /* ── Field Rows ── */
+        .field-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .field-row.tight { margin-bottom: 8px; }
+
+        .field-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .field-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .field-group label .hint {
+            font-weight: 400;
+            text-transform: none;
+            font-style: italic;
+            color: #999;
+        }
+        .field-group input[type="text"],
+        .field-group input[type="email"],
+        .field-group input[type="tel"],
+        .field-group input[type="number"],
+        .field-group input[type="date"],
+        .field-group textarea {
+            border: 1.5px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: #fafafa;
+        }
+        .field-group input:focus,
+        .field-group textarea:focus {
+            outline: none;
+            border-color: #4a6cf7;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(74,108,247,0.1);
+        }
+        .field-group textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        /* ── Checkbox Groups ── */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #4a6cf7;
+            cursor: pointer;
+        }
+
+        /* ── Yes/No Radio Groups ── */
+        .compliance-table {
+            width: 100%;
+            margin: 8px 0;
+        }
+        .compliance-row {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .compliance-row:last-child { border-bottom: none; }
+        .compliance-label { flex: 1; font-size: 13px; }
+        .compliance-options {
+            display: flex;
+            gap: 16px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .radio-option input[type="radio"] {
+            accent-color: #4a6cf7;
+            cursor: pointer;
+        }
+
+        /* ── Pass/Fail Toggle ── */
+        .pass-fail {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin: 8px 0;
+        }
+        .pass-fail label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+        }
+        .toggle-btn {
+            padding: 6px 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover { border-color: #aaa; }
+        .toggle-btn.passed.active { background: #d4edda; border-color: #28a745; color: #155724; }
+        .toggle-btn.failed.active { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+        /* ── Readings ── */
+        .reading-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .reading-label {
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 260px;
+            color: #444;
+        }
+        .reading-input {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .reading-input span { font-size: 12px; color: #666; }
+        .reading-input input {
+            width: 70px;
+            border: 1.5px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 14px;
+            text-align: center;
+            background: #fafafa;
+        }
+        .reading-input input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+            background: white;
+        }
+
+        /* ── Email Config (hardcoded, hidden) ── */
+
+        /* ── Buttons ── */
+        .actions {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            background: #fafafa;
+            border-top: 1px solid #eee;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-secondary {
+            background: #e8e8e8;
+            color: #444;
+        }
+        .btn-secondary:hover { background: #ddd; }
+        .btn-primary {
+            background: #4a6cf7;
+            color: white;
+        }
+        .btn-primary:hover { background: #3a5ce5; }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover { background: #218838; }
+
+        /* ── Toast Notification ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a2e;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { background: #dc3545; }
+        .toast.success { background: #28a745; }
+
+        /* ── Setup Banner (removed - config is hardcoded) ── */
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .checkbox-grid { grid-template-columns: 1fr; }
+            .field-row { flex-direction: column; gap: 8px; }
+            .reading-label { min-width: auto; }
+            .actions { flex-direction: column; }
+            .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════ NAVBAR ═══════════════════ -->
+<nav class="navbar">
+    <div>
+        <h1>DTA Electrical &amp; Mechanical</h1>
+        <div class="subtitle">Form Filling Service &mdash; Fill, generate PDF &amp; email completed forms</div>
+    </div>
+</nav>
+
+<div class="main-container">
+
+    <!-- Setup banner hidden - email is pre-configured -->
+
+    <!-- ═══════════════════ FORM SELECTOR ═══════════════════ -->
+    <div class="form-selector">
+        <h2>Select Form Template</h2>
+        <div class="form-cards">
+            <div class="form-card active" onclick="selectForm('tmv')">
+                <h3>TMV Commissioning Report</h3>
+                <p>Thermostatic Mixing Valve Commissioning / Maintenance Report</p>
+            </div>
+            <div class="form-card" style="opacity:0.5;cursor:default;">
+                <h3>+ Add Template</h3>
+                <p>More form templates coming soon</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email config - hardcoded, hidden from engineers -->
+    <input type="hidden" id="recipientEmail" value="admin@dtaelectricalmechanical.co.uk">
+    <input type="hidden" id="ejsPublicKey" value="zyfJx9BujPpf4smFJ">
+    <input type="hidden" id="ejsServiceId" value="service_u1gyn9g">
+    <input type="hidden" id="ejsTemplateId" value="template_v4b2bkf">
+
+    <div style="background:#e8f5e9;border:1.5px solid #4caf50;border-radius:10px;padding:12px 20px;margin-bottom:24px;display:flex;align-items:center;gap:10px;font-size:13px;">
+        <span style="font-size:18px;">&#9993;</span>
+        <span>Completed forms will be emailed as PDF to <strong>admin@dtaelectricalmechanical.co.uk</strong></span>
+    </div>
+
+    <!-- ═══════════════════ TMV FORM ═══════════════════ -->
+    <form id="tmvForm" class="form-container" onsubmit="return false;">
+
+        <!-- SITE DETAILS -->
+        <div class="section-header">Site Details</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group">
+                    <label>Name of Establishment</label>
+                    <input type="text" id="establishment" required>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label>Street Address <span class="hint">(include town/city & postcode)</span></label>
+                    <input type="text" id="streetAddress" placeholder="e.g. 14 High Street, Manchester, M1 2AB" required>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label>Contact Person</label>
+                    <input type="text" id="contactPerson">
+                </div>
+                <div class="field-group">
+                    <label>Contact Number</label>
+                    <input type="tel" id="contactNumber" placeholder="e.g. 07700 900123">
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label>Contact Person Email</label>
+                    <input type="email" id="contactEmail">
+                </div>
+            </div>
+        </div>
+
+        <!-- THERMOSTATIC MIXING VALVE INFORMATION -->
+        <div class="section-header">Thermostatic Mixing Valve Information</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Make</label><input type="text" id="make"></div>
+                <div class="field-group"><label>Model No</label><input type="text" id="modelNo"></div>
+                <div class="field-group"><label>Serial No</label><input type="text" id="serialNo"></div>
+                <div class="field-group"><label>Size (mm)</label><input type="text" id="size"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Valve No</label><input type="text" id="valveNo"></div>
+                <div class="field-group" style="flex:3"><label>Location of Valve in Building</label><input type="text" id="valveLocation"></div>
+            </div>
+
+            <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Number of outlets served by this valve:</p>
+            <div class="field-row tight">
+                <div class="field-group"><label>Baths</label><input type="number" id="baths" min="0"></div>
+                <div class="field-group"><label>Basins</label><input type="number" id="basins" min="0"></div>
+                <div class="field-group"><label>Showers</label><input type="number" id="showers" min="0"></div>
+            </div>
+            <div class="field-row tight">
+                <div class="field-group"><label>Sinks</label><input type="number" id="sinks" min="0"></div>
+                <div class="field-group"><label>Other</label><input type="number" id="otherOutlets" min="0"></div>
+                <div class="field-group"><label>If Other, Specify</label><input type="text" id="otherSpecify"></div>
+            </div>
+
+            <p style="font-size:13px;font-weight:600;margin:16px 0 8px;color:#444">Mixing Valves installed in compliance with requirements of:</p>
+
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">A. Drawings and Specifications</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="compA" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="compA" value="no"> No</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">B. Manufacturer / Supplier Installation Instructions</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="compB" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="compB" value="no"> No</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">C. Relevant Code of Practice for TMV's</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="compC" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="compC" value="no"> No</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">D. Local Water Authority / WRAS Standards</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="compD" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="compD" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field-row" style="margin-top:8px">
+                <div class="field-group">
+                    <label>If No, provide the reason and the action taken</label>
+                    <textarea id="complianceReason"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST RESULTS -->
+        <div class="section-header">Test Results</div>
+        <div class="section-body">
+            <p style="font-size:13px;font-weight:600;margin-bottom:8px;color:#444">Work carried out during this site visit:</p>
+            <div class="checkbox-grid">
+                <label class="checkbox-item"><input type="checkbox" id="chkDismantled"> Dismantled</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkInspected"> Components Inspected and Cleaned</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkThermoReplaced"> Thermostatic Element Replaced</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkCommissioned"> Commissioned</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkServiced"> Serviced</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkNonReturn"> Non-return Valves Checked</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkORings"> O Rings Replaced</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkTempSet"> Temperature Set</label>
+            </div>
+
+            <div class="pass-fail" style="margin-top: 14px;">
+                <label>Valve Considered Satisfactory for Use:</label>
+                <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed')">Passed</button>
+                <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed')">Failed</button>
+                <input type="hidden" id="passFail" value="">
+            </div>
+
+            <div style="margin-top:16px">
+                <div class="reading-row">
+                    <div class="reading-label">Temperature of Water Supply</div>
+                    <div class="reading-input">
+                        <span>Hot</span>
+                        <input type="number" id="tempHot" step="0.1">
+                        <span>°C</span>
+                    </div>
+                    <div class="reading-input">
+                        <span>Cold</span>
+                        <input type="number" id="tempCold" step="0.1">
+                        <span>°C</span>
+                    </div>
+                </div>
+                <div class="reading-row">
+                    <div class="reading-label">Dynamic Pressure of Water Supply</div>
+                    <div class="reading-input">
+                        <span>Hot</span>
+                        <input type="number" id="pressHot" step="0.1">
+                        <span>bar</span>
+                    </div>
+                    <div class="reading-input">
+                        <span>Cold</span>
+                        <input type="number" id="pressCold" step="0.1">
+                        <span>bar</span>
+                    </div>
+                </div>
+                <div class="reading-row">
+                    <div class="reading-label">Temperature of Water at TMV Outlet</div>
+                    <div class="reading-input">
+                        <input type="number" id="tempOutlet" step="0.1">
+                        <span>°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTALLATION & SERVICE INFORMATION -->
+        <div class="section-header">Installation & Service Information</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Date of Installation</label><input type="date" id="dateInstall"></div>
+                <div class="field-group"><label>Valve Installed By</label><input type="text" id="installedBy"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Date of Commissioning</label><input type="date" id="dateCommission"></div>
+                <div class="field-group"><label>Valve Commissioned By</label><input type="text" id="commissionedBy"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Date of Service</label><input type="date" id="dateService"></div>
+                <div class="field-group"><label>Valve Serviced By</label><input type="text" id="servicedBy"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Next Service Date</label><input type="date" id="nextServiceDate"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label>Comments on the Installation</label>
+                    <textarea id="comments"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- LICENSED PLUMBERS SIGNATURE -->
+        <div class="section-header">Licensed Plumbers Signature</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Plumbers' Full Name</label><input type="text" id="plumberName"></div>
+                <div class="field-group"><label>Plumbers Licence No.</label><input type="text" id="plumberLicence"></div>
+                <div class="field-group"><label>Date</label><input type="date" id="signDate"></div>
+            </div>
+            <p style="font-size:11px;color:#888;margin-top:4px;font-style:italic">
+                It is hereby certified that all the commissioning work has been carried out by the undersigned
+                in accordance with the relevant British Standards (BS 7942 / BS EN 1111) requirements for Thermostatic Mixing Valves.
+            </p>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+            <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+            <button type="button" class="btn btn-primary" onclick="generatePDF()">Download PDF</button>
+            <button type="button" class="btn btn-success" onclick="generateAndEmail()">Generate PDF & Email</button>
+        </div>
+    </form>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// UTILITY
+// ══════════════════════════════════════════════════
+function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.className = 'toast', 3500);
+}
+
+function val(id) { return document.getElementById(id)?.value || ''; }
+function checked(id) { return document.getElementById(id)?.checked || false; }
+function radio(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '';
+}
+
+function togglePassFail(btn, type) {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('passFail').value = type;
+}
+
+function selectForm(formType) {
+    // For future expansion with multiple forms
+    document.querySelectorAll('.form-card').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+}
+
+function clearForm() {
+    document.getElementById('tmvForm').reset();
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('passFail').value = '';
+    showToast('Form cleared');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-GB');
+}
+
+// ══════════════════════════════════════════════════
+// PDF GENERATION
+// ══════════════════════════════════════════════════
+function collectFormData() {
+    return {
+        establishment: val('establishment'),
+        streetAddress: val('streetAddress'),
+        contactPerson: val('contactPerson'),
+        contactNumber: val('contactNumber'),
+        contactEmail: val('contactEmail'),
+        make: val('make'),
+        modelNo: val('modelNo'),
+        serialNo: val('serialNo'),
+        size: val('size'),
+        valveNo: val('valveNo'),
+        valveLocation: val('valveLocation'),
+        baths: val('baths'),
+        basins: val('basins'),
+        showers: val('showers'),
+        sinks: val('sinks'),
+        otherOutlets: val('otherOutlets'),
+        otherSpecify: val('otherSpecify'),
+        compA: radio('compA'),
+        compB: radio('compB'),
+        compC: radio('compC'),
+        compD: radio('compD'),
+        complianceReason: val('complianceReason'),
+        chkDismantled: checked('chkDismantled'),
+        chkInspected: checked('chkInspected'),
+        chkThermoReplaced: checked('chkThermoReplaced'),
+        chkCommissioned: checked('chkCommissioned'),
+        chkServiced: checked('chkServiced'),
+        chkNonReturn: checked('chkNonReturn'),
+        chkORings: checked('chkORings'),
+        chkTempSet: checked('chkTempSet'),
+        passFail: val('passFail'),
+        tempHot: val('tempHot'),
+        tempCold: val('tempCold'),
+        pressHot: val('pressHot'),
+        pressCold: val('pressCold'),
+        tempOutlet: val('tempOutlet'),
+        dateInstall: val('dateInstall'),
+        installedBy: val('installedBy'),
+        dateCommission: val('dateCommission'),
+        commissionedBy: val('commissionedBy'),
+        dateService: val('dateService'),
+        servicedBy: val('servicedBy'),
+        nextServiceDate: val('nextServiceDate'),
+        comments: val('comments'),
+        plumberName: val('plumberName'),
+        plumberLicence: val('plumberLicence'),
+        signDate: val('signDate')
+    };
+}
+
+function generatePDF(returnBlob = false) {
+    const d = collectFormData();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pw = 210, ph = 297;
+    const ml = 12, mr = pw - 12;
+    const cw = mr - ml;
+    let y = 12;
+
+    // Colors
+    const darkBg = [26, 26, 46];
+    const lightGray = [240, 240, 240];
+
+    // ── Title ──
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('THERMOSTATIC MIXING VALVE', pw/2, y, { align: 'center' });
+    y += 6;
+    doc.text('COMMISSIONING/MAINTENANCE REPORT', pw/2, y, { align: 'center' });
+    y += 8;
+
+    // ── Helper Functions ──
+    function sectionHeader(text) {
+        doc.setFillColor(...darkBg);
+        doc.rect(ml, y, cw, 7, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text(text, ml + 3, y + 5);
+        doc.setTextColor(0, 0, 0);
+        y += 9;
+    }
+
+    function fieldBox(x, yp, w, h, label, value) {
+        doc.setDrawColor(200);
+        doc.rect(x, yp, w, h);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6);
+        doc.setTextColor(120);
+        doc.text(label, x + 1.5, yp + 3.5);
+        doc.setTextColor(0);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        if (value) doc.text(String(value), x + 2, yp + h - 2);
+    }
+
+    function checkBox(x, yp, isChecked) {
+        doc.setDrawColor(150);
+        doc.rect(x, yp, 3.5, 3.5);
+        if (isChecked) {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.text('X', x + 0.5, yp + 3);
+        }
+    }
+
+    // ── SITE DETAILS ──
+    sectionHeader('SITE DETAILS');
+    fieldBox(ml, y, cw, 9, 'Name of Establishment', d.establishment);
+    y += 9;
+    fieldBox(ml, y, cw, 9, 'Street Address (include town/city & postcode)', d.streetAddress);
+    y += 9;
+    fieldBox(ml, y, cw/2, 9, 'Contact Person', d.contactPerson);
+    fieldBox(ml + cw/2, y, cw/2, 9, 'Contact Number', d.contactNumber);
+    y += 9;
+    fieldBox(ml, y, cw, 9, 'Contact Person Email', d.contactEmail);
+    y += 11;
+
+    // ── VALVE INFORMATION ──
+    sectionHeader('THERMOSTATIC MIXING VALVE INFORMATION');
+    const qw = cw / 4;
+    fieldBox(ml, y, qw, 9, 'Make', d.make);
+    fieldBox(ml + qw, y, qw, 9, 'Model no', d.modelNo);
+    fieldBox(ml + qw*2, y, qw, 9, 'Serial no', d.serialNo);
+    fieldBox(ml + qw*3, y, qw, 9, 'Size (mm)', d.size);
+    y += 9;
+    fieldBox(ml, y, qw, 9, 'Valve no', d.valveNo);
+    fieldBox(ml + qw, y, cw - qw, 9, 'Location of valve in building', d.valveLocation);
+    y += 11;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text('Number of outlets served by this valve:', ml + 2, y);
+    y += 3;
+    const tw = cw / 3;
+    fieldBox(ml, y, tw, 8, 'Baths', d.baths);
+    fieldBox(ml + tw, y, tw, 8, 'Basins', d.basins);
+    fieldBox(ml + tw*2, y, tw, 8, 'Showers', d.showers);
+    y += 8;
+    fieldBox(ml, y, tw, 8, 'Sinks', d.sinks);
+    fieldBox(ml + tw, y, tw, 8, 'Other', d.otherOutlets);
+    fieldBox(ml + tw*2, y, tw, 8, 'If other, specify', d.otherSpecify);
+    y += 11;
+
+    // Compliance
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text('Mixing Valves installed in compliance with requirements of:', ml + 2, y);
+    y += 5;
+
+    const compItems = [
+        ['A.  Drawings and Specifications', d.compA],
+        ['B.  Manufacturer / Supplier Installation Instructions', d.compB],
+        ['C.  Relevant Code of Practice for TMV\'s', d.compC],
+        ['D.  Local Water Authority / WRAS Standards', d.compD]
+    ];
+
+    // Headers
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Yes', mr - 28, y);
+    doc.text('No', mr - 14, y);
+    y += 4;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    compItems.forEach(([label, value]) => {
+        doc.text(label, ml + 8, y + 2.5);
+        checkBox(mr - 27, y, value === 'yes');
+        checkBox(mr - 13, y, value === 'no');
+        y += 6;
+    });
+
+    y += 2;
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7);
+    doc.text('If No, provide the reason and the action taken:', ml + 3, y);
+    y += 2;
+    doc.setDrawColor(200);
+    doc.rect(ml, y, cw, 12);
+    if (d.complianceReason) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        const lines = doc.splitTextToSize(d.complianceReason, cw - 4);
+        doc.text(lines, ml + 2, y + 4);
+    }
+    y += 14;
+
+    // ── TEST RESULTS ──
+    sectionHeader('TEST RESULTS');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text('Work carried out during this site visit:', ml + 2, y);
+    y += 4;
+
+    const checks = [
+        [['Dismantled', d.chkDismantled], ['Components Inspected and Cleaned', d.chkInspected], ['Thermostatic Element Replaced', d.chkThermoReplaced]],
+        [['Commissioned', d.chkCommissioned], ['Serviced', d.chkServiced], ['Non-return Valves Checked', d.chkNonReturn]],
+        [['O Rings Replaced', d.chkORings], ['Temperature Set', d.chkTempSet], []]
+    ];
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    const cx = [ml + 4, ml + cw*0.36, ml + cw*0.7];
+    checks.forEach(row => {
+        row.forEach((item, i) => {
+            if (item.length > 0 && item[0]) {
+                checkBox(cx[i], y, item[1]);
+                doc.text(item[0], cx[i] + 5, y + 2.8);
+            }
+        });
+        y += 6;
+    });
+
+    y += 2;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.text('Valve Considered Satisfactory for Use:', ml + 3, y + 2.5);
+    checkBox(ml + cw*0.42, y, d.passFail === 'passed');
+    doc.setFont('helvetica', 'normal');
+    doc.text('Passed', ml + cw*0.42 + 5, y + 2.5);
+    checkBox(ml + cw*0.56, y, d.passFail === 'failed');
+    doc.text('Failed', ml + cw*0.56 + 5, y + 2.5);
+    y += 8;
+
+    // Readings
+    function readingRow(label, pairs) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.text(label, ml + 3, y + 2.5);
+        let rx = ml + cw * 0.5;
+        pairs.forEach(([sublabel, value, unit]) => {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7);
+            if (sublabel) { doc.text(sublabel, rx, y + 2.5); rx += 8; }
+            doc.setDrawColor(200);
+            doc.rect(rx, y, 16, 5.5);
+            if (value) { doc.setFontSize(8); doc.text(String(value), rx + 2, y + 4); }
+            rx += 17;
+            doc.setFontSize(7);
+            doc.text(unit, rx, y + 2.5);
+            rx += 14;
+        });
+        y += 8;
+    }
+
+    readingRow('Temperature of Water Supply', [['Hot', d.tempHot, '\u00B0C'], ['Cold', d.tempCold, '\u00B0C']]);
+    readingRow('Dynamic Pressure of Water Supply', [['Hot', d.pressHot, 'bar'], ['Cold', d.pressCold, 'bar']]);
+    readingRow('Temperature of Water at TMV Outlet', [['', d.tempOutlet, '\u00B0C']]);
+
+    y += 4;
+
+    // ── INSTALLATION & SERVICE INFORMATION ──
+    sectionHeader('INSTALLATION & SERVICE INFORMATION');
+    const hw = cw / 2;
+    const instRows = [
+        ['Date of Installation', formatDate(d.dateInstall), 'Valve Installed By', d.installedBy],
+        ['Date of Commissioning', formatDate(d.dateCommission), 'Valve Commissioned By', d.commissionedBy],
+        ['Date of Service', formatDate(d.dateService), 'Valve Serviced By', d.servicedBy],
+    ];
+    instRows.forEach(([l1, v1, l2, v2]) => {
+        fieldBox(ml, y, hw, 8, l1, v1);
+        fieldBox(ml + hw, y, hw, 8, l2, v2);
+        y += 8;
+    });
+    fieldBox(ml, y, cw, 8, 'Next Service Date', formatDate(d.nextServiceDate));
+    y += 8;
+    fieldBox(ml, y, cw, 16, 'Comments on the Installation', '');
+    if (d.comments) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        const clines = doc.splitTextToSize(d.comments, cw - 4);
+        doc.text(clines, ml + 2, y + 6);
+    }
+    y += 18;
+
+    // ── LICENSED PLUMBERS SIGNATURE ──
+    sectionHeader('LICENSED PLUMBERS SIGNATURE');
+    const thw = cw / 3;
+    fieldBox(ml, y, thw, 9, "Plumbers' Full Name", d.plumberName);
+    fieldBox(ml + thw, y, thw, 9, 'Plumbers Licence No.', d.plumberLicence);
+    fieldBox(ml + thw*2, y, thw, 9, 'Date', formatDate(d.signDate));
+    y += 12;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.text(
+        'It is hereby certified that all the commissioning work has been carried out by the undersigned in accordance with the',
+        ml + 3, y
+    );
+    y += 3.5;
+    doc.text('relevant British Standards (BS 7942 / BS EN 1111) requirements for Thermostatic Mixing Valves.', ml + 3, y);
+
+    if (returnBlob) {
+        return doc.output('blob');
+    }
+
+    const filename = `TMV_Report_${d.establishment || 'form'}_${new Date().toISOString().slice(0,10)}.pdf`;
+    doc.save(filename);
+    showToast('PDF downloaded: ' + filename, 'success');
+}
+
+// ══════════════════════════════════════════════════
+// EMAIL SENDING
+// ══════════════════════════════════════════════════
+function buildEmailHTML(d) {
+    const tick = '&#10004;';
+    const cross = '&#10008;';
+    const dash = '&mdash;';
+    const cb = (v) => v ? `<span style="color:#28a745;font-weight:bold">${tick}</span>` : `<span style="color:#ccc">${cross}</span>`;
+    const yn = (v) => v === 'yes' ? `<span style="color:#28a745;font-weight:bold">Yes</span>` : v === 'no' ? `<span style="color:#dc3545;font-weight:bold">No</span>` : dash;
+    const v = (val) => val || dash;
+
+    return `
+    <div style="font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:0 auto;color:#1a1a2e;">
+
+        <!-- HEADER -->
+        <div style="background:#1a1a2e;color:white;padding:16px 24px;border-radius:8px 8px 0 0;">
+            <h1 style="margin:0;font-size:18px;letter-spacing:0.5px;">THERMOSTATIC MIXING VALVE</h1>
+            <p style="margin:4px 0 0;font-size:13px;opacity:0.8;">Commissioning / Maintenance Report</p>
+        </div>
+
+        <!-- SITE DETAILS -->
+        <div style="border:1px solid #ddd;border-top:none;padding:0;">
+            <div style="background:#2d2d2d;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Site Details</div>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;width:180px;">Establishment</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;font-weight:600;">${v(d.establishment)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Address</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.streetAddress)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Contact Person</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.contactPerson)} &nbsp; ${d.contactNumber ? '| ' + d.contactNumber : ''}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Contact Email</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.contactEmail)}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- VALVE INFORMATION -->
+        <div style="border:1px solid #ddd;border-top:none;padding:0;">
+            <div style="background:#2d2d2d;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Thermostatic Mixing Valve Information</div>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;width:180px;">Make / Model</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.make)} ${d.modelNo ? '/ ' + d.modelNo : ''}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Serial No / Size</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.serialNo)} ${d.size ? '/ ' + d.size + ' mm' : ''}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Valve No</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.valveNo)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Location in Building</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.valveLocation)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Outlets Served</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">
+                        ${d.baths ? 'Baths: ' + d.baths + ' &nbsp; ' : ''}${d.basins ? 'Basins: ' + d.basins + ' &nbsp; ' : ''}${d.showers ? 'Showers: ' + d.showers + ' &nbsp; ' : ''}${d.sinks ? 'Sinks: ' + d.sinks + ' &nbsp; ' : ''}${d.otherOutlets ? 'Other: ' + d.otherOutlets + ' (' + (d.otherSpecify || '') + ')' : ''}
+                        ${!d.baths && !d.basins && !d.showers && !d.sinks && !d.otherOutlets ? dash : ''}
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Compliance -->
+            <div style="padding:12px 16px;border-top:1px solid #eee;">
+                <p style="font-size:12px;font-weight:bold;margin:0 0 8px;color:#444;">Compliance with Requirements:</p>
+                <table style="width:100%;border-collapse:collapse;font-size:12px;" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="padding:4px 0;">A. Drawings and Specifications</td>
+                        <td style="padding:4px 0;width:60px;text-align:center;">${yn(d.compA)}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 0;">B. Manufacturer / Supplier Instructions</td>
+                        <td style="padding:4px 0;text-align:center;">${yn(d.compB)}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 0;">C. Relevant Code of Practice for TMV's</td>
+                        <td style="padding:4px 0;text-align:center;">${yn(d.compC)}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:4px 0;">D. Local Water Authority / WRAS Standards</td>
+                        <td style="padding:4px 0;text-align:center;">${yn(d.compD)}</td>
+                    </tr>
+                </table>
+                ${d.complianceReason ? '<p style="font-size:12px;margin:8px 0 0;color:#dc3545;"><strong>Non-compliance note:</strong> ' + d.complianceReason + '</p>' : ''}
+            </div>
+        </div>
+
+        <!-- TEST RESULTS -->
+        <div style="border:1px solid #ddd;border-top:none;padding:0;">
+            <div style="background:#2d2d2d;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Test Results</div>
+            <div style="padding:12px 16px;">
+                <p style="font-size:12px;font-weight:bold;margin:0 0 8px;color:#444;">Work Carried Out:</p>
+                <table style="font-size:12px;border-collapse:collapse;" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkDismantled)} Dismantled</td>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkInspected)} Inspected &amp; Cleaned</td>
+                        <td style="padding:3px 0;">${cb(d.chkThermoReplaced)} Thermo Element Replaced</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkCommissioned)} Commissioned</td>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkServiced)} Serviced</td>
+                        <td style="padding:3px 0;">${cb(d.chkNonReturn)} Non-return Valves Checked</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkORings)} O Rings Replaced</td>
+                        <td style="padding:3px 0;">${cb(d.chkTempSet)} Temperature Set</td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Pass/Fail -->
+            <div style="padding:0 16px 12px;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td style="padding:8px 0;font-weight:bold;color:#444;">Satisfactory for Use</td>
+                        <td style="padding:8px 0;text-align:right;">
+                            ${d.passFail === 'passed'
+                                ? '<span style="background:#d4edda;color:#155724;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:14px;">PASSED</span>'
+                                : d.passFail === 'failed'
+                                ? '<span style="background:#f8d7da;color:#721c24;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:14px;">FAILED</span>'
+                                : '<span style="color:#999;">Not specified</span>'}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Readings -->
+            <table style="width:100%;border-collapse:collapse;font-size:13px;border-top:1px solid #eee;" cellpadding="0" cellspacing="0">
+                <tr style="background:#f8f9fa;">
+                    <td style="padding:8px 16px;color:#666;">Temperature of Water Supply</td>
+                    <td style="padding:8px 16px;text-align:right;">Hot: <strong>${d.tempHot || dash}</strong> &deg;C &nbsp; Cold: <strong>${d.tempCold || dash}</strong> &deg;C</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;color:#666;">Dynamic Pressure</td>
+                    <td style="padding:8px 16px;text-align:right;">Hot: <strong>${d.pressHot || dash}</strong> bar &nbsp; Cold: <strong>${d.pressCold || dash}</strong> bar</td>
+                </tr>
+                <tr style="background:#f8f9fa;">
+                    <td style="padding:8px 16px;color:#666;font-weight:bold;">TMV Outlet Temperature</td>
+                    <td style="padding:8px 16px;text-align:right;font-size:15px;font-weight:bold;">${d.tempOutlet || dash} &deg;C</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- INSTALLATION & SERVICE -->
+        <div style="border:1px solid #ddd;border-top:none;padding:0;">
+            <div style="background:#2d2d2d;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Installation &amp; Service Information</div>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;width:180px;">Date of Installation</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${formatDate(d.dateInstall) || dash}</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Installed By</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.installedBy)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Date of Commissioning</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${formatDate(d.dateCommission) || dash}</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Commissioned By</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.commissionedBy)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Date of Service</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${formatDate(d.dateService) || dash}</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Serviced By</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.servicedBy)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Next Service Date</td>
+                    <td colspan="3" style="padding:8px 16px;border-bottom:1px solid #eee;font-weight:bold;">${formatDate(d.nextServiceDate) || dash}</td>
+                </tr>
+            </table>
+            ${d.comments ? '<div style="padding:10px 16px;font-size:12px;border-top:1px solid #eee;"><strong>Comments:</strong> ' + d.comments + '</div>' : ''}
+        </div>
+
+        <!-- PLUMBER SIGNATURE -->
+        <div style="border:1px solid #ddd;border-top:none;padding:0;border-radius:0 0 8px 8px;">
+            <div style="background:#2d2d2d;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Licensed Plumber</div>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="padding:10px 16px;color:#666;width:180px;">Plumber's Name</td>
+                    <td style="padding:10px 16px;font-weight:bold;">${v(d.plumberName)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 16px;color:#666;border-top:1px solid #eee;">Licence No.</td>
+                    <td style="padding:10px 16px;border-top:1px solid #eee;">${v(d.plumberLicence)}</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 16px;color:#666;border-top:1px solid #eee;">Date Signed</td>
+                    <td style="padding:10px 16px;border-top:1px solid #eee;">${formatDate(d.signDate) || dash}</td>
+                </tr>
+            </table>
+            <div style="padding:10px 16px;font-size:10px;color:#888;border-top:1px solid #eee;font-style:italic;">
+                It is hereby certified that all the commissioning work has been carried out by the undersigned
+                in accordance with the relevant British Standards (BS 7942 / BS EN 1111) requirements for Thermostatic Mixing Valves.
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div style="text-align:center;padding:16px;font-size:11px;color:#999;">
+            DTA Electrical &amp; Mechanical &mdash; Generated ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'})}
+        </div>
+    </div>`;
+}
+
+async function generateAndEmail() {
+    const recipientEmail = val('recipientEmail');
+    const publicKey = val('ejsPublicKey');
+    const serviceId = val('ejsServiceId');
+    const templateId = val('ejsTemplateId');
+
+    if (!recipientEmail) {
+        showToast('Please enter a recipient email address', 'error');
+        return;
+    }
+
+    if (!publicKey || !serviceId || !templateId) {
+        showToast('Please configure EmailJS settings first', 'error');
+        return;
+    }
+
+    // Load EmailJS if not already loaded
+    if (!window.emailjs) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve, reject) => {
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Failed to load EmailJS'));
+        });
+    }
+
+    try {
+        emailjs.init(publicKey);
+
+        const d = collectFormData();
+        const subject = `TMV Report - ${d.establishment || 'No Establishment'} - ${new Date().toLocaleDateString('en-GB')}`;
+        const htmlBody = buildEmailHTML(d);
+
+        await emailjs.send(serviceId, templateId, {
+            to_email: recipientEmail,
+            from_name: d.plumberName || 'DTA Form Service',
+            subject: subject,
+            message_html: htmlBody
+        });
+
+        showToast('Email sent successfully to ' + recipientEmail, 'success');
+    } catch (err) {
+        console.error('Email error:', err);
+        showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
+
+        // Fallback: download the PDF instead
+        generatePDF();
+        showToast('PDF downloaded as fallback. Check EmailJS config.', 'error');
+    }
+}
+
+// Email settings are hardcoded - no persistence needed.
+// To change EmailJS credentials, edit the hidden input values at the top of the page.
+//
+// ══════════════════════════════════════════════════
+// EMAILJS SETUP INSTRUCTIONS (one-time):
+// ══════════════════════════════════════════════════
+// 1. Go to https://www.emailjs.com and sign up (free tier = 200 emails/month)
+// 2. Add an Email Service → choose Gmail → connect your Gmail account
+// 3. Create an Email Template with these variables in the body:
+//      Subject: {{subject}}
+//      Body:    {{message}}
+//      To:      {{to_email}}
+//      From:    {{from_name}}
+// 4. Copy your Public Key (Account → API Keys)
+// 5. Copy the Service ID (Email Services tab)
+// 6. Copy the Template ID (Email Templates tab)
+// 7. Replace YOUR_PUBLIC_KEY, YOUR_SERVICE_ID, YOUR_TEMPLATE_ID
+//    in the hidden inputs above with the real values.
+</script>
+</body>
+</html>
