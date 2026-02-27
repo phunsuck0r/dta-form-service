@@ -612,15 +612,15 @@
             </div>
         </div>
 
-        <!-- LICENSED PLUMBERS SIGNATURE -->
-        <div class="section-header">Licensed Plumbers Signature</div>
+        <!-- ENGINEER SIGNATURE -->
+        <div class="section-header">Engineer Signature</div>
         <div class="section-body">
             <div class="field-row">
-                <div class="field-group"><label>Plumbers' Full Name <span class="required-star">*</span></label><input type="text" id="plumberName"></div>
+                <div class="field-group"><label>Engineer's Full Name <span class="required-star">*</span></label><input type="text" id="plumberName"></div>
                 <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="signDate"></div>
             </div>
             <p style="font-size:11px;color:#888;margin-top:4px;font-style:italic">
-                It is hereby certified that all the commissioning work has been carried out by the undersigned
+                It is hereby certified that all commissioning work has been carried out by the undersigned
                 in accordance with the relevant British Standards (BS 7942 / BS EN 1111) requirements for Thermostatic Mixing Valves.
             </p>
         </div>
@@ -770,7 +770,7 @@ function validateForm() {
     reqField('tempOutlet', 'TMV Outlet Temperature');
 
     // ── Plumber Sign-off ──
-    reqField('plumberName', "Plumber's Full Name");
+    reqField('plumberName', "Engineer's Full Name");
     reqField('signDate', 'Sign-off Date');
 
     // Show/hide validation message
@@ -1073,17 +1073,17 @@ function generatePDF(returnBlob = false) {
     }
     y += 18;
 
-    // ── LICENSED PLUMBERS SIGNATURE ──
-    sectionHeader('LICENSED PLUMBERS SIGNATURE');
+    // ── ENGINEER SIGNATURE ──
+    sectionHeader('ENGINEER SIGNATURE');
     const thw = cw / 2;
-    fieldBox(ml, y, thw, 9, "Plumbers' Full Name", d.plumberName);
+    fieldBox(ml, y, thw, 9, "Engineer's Full Name", d.plumberName);
     fieldBox(ml + thw, y, thw, 9, 'Date', formatDate(d.signDate));
     y += 12;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(6.5);
     doc.text(
-        'It is hereby certified that all the commissioning work has been carried out by the undersigned in accordance with the',
+        'It is hereby certified that all commissioning work has been carried out by the undersigned in accordance with the',
         ml + 3, y
     );
     y += 3.5;
@@ -1282,12 +1282,12 @@ function buildEmailHTML(d) {
             ${d.comments ? '<div style="padding:10px 16px;font-size:12px;border-top:1px solid #eee;"><strong>Comments:</strong> ' + d.comments + '</div>' : ''}
         </div>
 
-        <!-- PLUMBER SIGNATURE -->
+        <!-- ENGINEER SIGNATURE -->
         <div style="border:1px solid #ddd;border-top:none;padding:0;border-radius:0 0 8px 8px;">
-            <div style="background:#2d2d2d;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Licensed Plumber</div>
+            <div style="background:#2d2d2d;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Engineer</div>
             <table style="width:100%;border-collapse:collapse;font-size:13px;" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td style="padding:10px 16px;color:#666;width:180px;">Plumber's Name</td>
+                    <td style="padding:10px 16px;color:#666;width:180px;">Engineer's Name</td>
                     <td style="padding:10px 16px;font-weight:bold;">${v(d.plumberName)}</td>
                 </tr>
                 <tr>
@@ -1296,7 +1296,7 @@ function buildEmailHTML(d) {
                 </tr>
             </table>
             <div style="padding:10px 16px;font-size:10px;color:#888;border-top:1px solid #eee;font-style:italic;">
-                It is hereby certified that all the commissioning work has been carried out by the undersigned
+                It is hereby certified that all commissioning work has been carried out by the undersigned
                 in accordance with the relevant British Standards (BS 7942 / BS EN 1111) requirements for Thermostatic Mixing Valves.
             </div>
         </div>
@@ -1345,7 +1345,7 @@ async function generateAndEmail() {
 
         await emailjs.send(serviceId, templateId, {
             to_email: recipientEmail,
-            from_name: d.plumberName || 'DTA Form Service',
+            from_name: d.plumberName || 'DTA Engineer',
             subject: subject,
             message_html: htmlBody
         });
