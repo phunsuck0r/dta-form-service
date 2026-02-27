@@ -328,6 +328,46 @@
 
         /* ── Setup Banner (removed - config is hardcoded) ── */
 
+        /* ── Required Field Asterisks ── */
+        .required-star {
+            color: #dc3545;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+        .field-group input.invalid,
+        .field-group textarea.invalid {
+            border-color: #dc3545 !important;
+            background: #fff5f5 !important;
+            box-shadow: 0 0 0 3px rgba(220,53,69,0.12) !important;
+        }
+        .compliance-row.invalid {
+            background: #fff5f5;
+            border-left: 3px solid #dc3545;
+        }
+        .pass-fail.invalid {
+            background: #fff5f5;
+            border-radius: 6px;
+            padding: 8px !important;
+            border: 1.5px solid #dc3545;
+        }
+        .validation-msg {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            display: none;
+        }
+        .validation-msg ul {
+            margin: 6px 0 0 16px;
+            padding: 0;
+        }
+        .validation-msg li {
+            margin-bottom: 2px;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 600px) {
             .checkbox-grid { grid-template-columns: 1fr; }
@@ -378,6 +418,12 @@
         <span>Completed forms will be emailed as PDF to <strong>admin@dtaelectricalmechanical.co.uk</strong></span>
     </div>
 
+    <!-- Validation Message -->
+    <div class="validation-msg" id="validationMsg">
+        <strong>Please complete the following required fields:</strong>
+        <ul id="validationList"></ul>
+    </div>
+
     <!-- ═══════════════════ TMV FORM ═══════════════════ -->
     <form id="tmvForm" class="form-container" onsubmit="return false;">
 
@@ -386,29 +432,29 @@
         <div class="section-body">
             <div class="field-row">
                 <div class="field-group">
-                    <label>Name of Establishment</label>
+                    <label>Name of Establishment <span class="required-star">*</span></label>
                     <input type="text" id="establishment" required>
                 </div>
             </div>
             <div class="field-row">
                 <div class="field-group">
-                    <label>Street Address <span class="hint">(include town/city & postcode)</span></label>
+                    <label>Street Address <span class="required-star">*</span> <span class="hint">(include town/city & postcode)</span></label>
                     <input type="text" id="streetAddress" placeholder="e.g. 14 High Street, Manchester, M1 2AB" required>
                 </div>
             </div>
             <div class="field-row">
                 <div class="field-group">
-                    <label>Contact Person</label>
+                    <label>Contact Person <span class="required-star">*</span></label>
                     <input type="text" id="contactPerson">
                 </div>
                 <div class="field-group">
-                    <label>Contact Number</label>
+                    <label>Contact Number <span class="required-star">*</span></label>
                     <input type="tel" id="contactNumber" placeholder="e.g. 07700 900123">
                 </div>
             </div>
             <div class="field-row">
                 <div class="field-group">
-                    <label>Contact Person Email</label>
+                    <label>Contact Person Email <span class="required-star">*</span></label>
                     <input type="email" id="contactEmail">
                 </div>
             </div>
@@ -418,14 +464,14 @@
         <div class="section-header">Thermostatic Mixing Valve Information</div>
         <div class="section-body">
             <div class="field-row">
-                <div class="field-group"><label>Make</label><input type="text" id="make"></div>
-                <div class="field-group"><label>Model No</label><input type="text" id="modelNo"></div>
+                <div class="field-group"><label>Make <span class="required-star">*</span></label><input type="text" id="make"></div>
+                <div class="field-group"><label>Model No <span class="required-star">*</span></label><input type="text" id="modelNo"></div>
                 <div class="field-group"><label>Serial No</label><input type="text" id="serialNo"></div>
                 <div class="field-group"><label>Size (mm)</label><input type="text" id="size"></div>
             </div>
             <div class="field-row">
                 <div class="field-group"><label>Valve No</label><input type="text" id="valveNo"></div>
-                <div class="field-group" style="flex:3"><label>Location of Valve in Building</label><input type="text" id="valveLocation"></div>
+                <div class="field-group" style="flex:3"><label>Location of Valve in Building <span class="required-star">*</span></label><input type="text" id="valveLocation"></div>
             </div>
 
             <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Number of outlets served by this valve:</p>
@@ -440,7 +486,7 @@
                 <div class="field-group"><label>If Other, Specify</label><input type="text" id="otherSpecify"></div>
             </div>
 
-            <p style="font-size:13px;font-weight:600;margin:16px 0 8px;color:#444">Mixing Valves installed in compliance with requirements of:</p>
+            <p style="font-size:13px;font-weight:600;margin:16px 0 8px;color:#444">Mixing Valves installed in compliance with requirements of: <span class="required-star">*</span></p>
 
             <div class="compliance-table">
                 <div class="compliance-row">
@@ -496,8 +542,8 @@
                 <label class="checkbox-item"><input type="checkbox" id="chkTempSet"> Temperature Set</label>
             </div>
 
-            <div class="pass-fail" style="margin-top: 14px;">
-                <label>Valve Considered Satisfactory for Use:</label>
+            <div class="pass-fail" id="passFailGroup" style="margin-top: 14px;">
+                <label>Valve Considered Satisfactory for Use: <span class="required-star">*</span></label>
                 <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed')">Passed</button>
                 <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed')">Failed</button>
                 <input type="hidden" id="passFail" value="">
@@ -505,7 +551,7 @@
 
             <div style="margin-top:16px">
                 <div class="reading-row">
-                    <div class="reading-label">Temperature of Water Supply</div>
+                    <div class="reading-label">Temperature of Water Supply <span class="required-star">*</span></div>
                     <div class="reading-input">
                         <span>Hot</span>
                         <input type="number" id="tempHot" step="0.1">
@@ -518,7 +564,7 @@
                     </div>
                 </div>
                 <div class="reading-row">
-                    <div class="reading-label">Dynamic Pressure of Water Supply</div>
+                    <div class="reading-label">Dynamic Pressure of Water Supply <span class="required-star">*</span></div>
                     <div class="reading-input">
                         <span>Hot</span>
                         <input type="number" id="pressHot" step="0.1">
@@ -531,7 +577,7 @@
                     </div>
                 </div>
                 <div class="reading-row">
-                    <div class="reading-label">Temperature of Water at TMV Outlet</div>
+                    <div class="reading-label">Temperature of Water at TMV Outlet <span class="required-star">*</span></div>
                     <div class="reading-input">
                         <input type="number" id="tempOutlet" step="0.1">
                         <span>°C</span>
@@ -570,9 +616,9 @@
         <div class="section-header">Licensed Plumbers Signature</div>
         <div class="section-body">
             <div class="field-row">
-                <div class="field-group"><label>Plumbers' Full Name</label><input type="text" id="plumberName"></div>
-                <div class="field-group"><label>Plumbers Licence No.</label><input type="text" id="plumberLicence"></div>
-                <div class="field-group"><label>Date</label><input type="date" id="signDate"></div>
+                <div class="field-group"><label>Plumbers' Full Name <span class="required-star">*</span></label><input type="text" id="plumberName"></div>
+                <div class="field-group"><label>Plumbers Licence No. <span class="required-star">*</span></label><input type="text" id="plumberLicence"></div>
+                <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="signDate"></div>
             </div>
             <p style="font-size:11px;color:#888;margin-top:4px;font-style:italic">
                 It is hereby certified that all the commissioning work has been carried out by the undersigned
@@ -614,6 +660,8 @@ function togglePassFail(btn, type) {
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('passFail').value = type;
+    const pfGroup = document.getElementById('passFailGroup');
+    if (pfGroup) pfGroup.classList.remove('invalid');
 }
 
 function selectForm(formType) {
@@ -622,10 +670,25 @@ function selectForm(formType) {
     event.currentTarget.classList.add('active');
 }
 
+// Clear invalid styling on user input
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('invalid')) {
+        e.target.classList.remove('invalid');
+    }
+});
+document.addEventListener('change', function(e) {
+    if (e.target.type === 'radio') {
+        const row = e.target.closest('.compliance-row');
+        if (row) row.classList.remove('invalid');
+    }
+});
+
 function clearForm() {
     document.getElementById('tmvForm').reset();
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('passFail').value = '';
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+    document.getElementById('validationMsg').style.display = 'none';
     showToast('Form cleared');
 }
 
@@ -633,6 +696,95 @@ function formatDate(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr + 'T00:00:00');
     return d.toLocaleDateString('en-GB');
+}
+
+// ══════════════════════════════════════════════════
+// FORM VALIDATION
+// ══════════════════════════════════════════════════
+function validateForm() {
+    const errors = [];
+    // Clear previous invalid states
+    document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
+
+    // Helper: mark a text/number/date input invalid
+    function reqField(id, label) {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) {
+            if (el) el.classList.add('invalid');
+            errors.push(label);
+        }
+    }
+
+    // Helper: mark a radio group invalid
+    function reqRadio(name, label) {
+        const chosen = document.querySelector(`input[name="${name}"]:checked`);
+        if (!chosen) {
+            const row = document.querySelector(`input[name="${name}"]`)?.closest('.compliance-row');
+            if (row) row.classList.add('invalid');
+            errors.push(label);
+        }
+    }
+
+    // ── Site Details ──
+    reqField('establishment', 'Name of Establishment');
+    reqField('streetAddress', 'Street Address');
+    reqField('contactPerson', 'Contact Person');
+    reqField('contactNumber', 'Contact Number');
+    reqField('contactEmail', 'Contact Person Email');
+
+    // Email format check
+    const emailEl = document.getElementById('contactEmail');
+    if (emailEl && emailEl.value.trim()) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailEl.value.trim())) {
+            emailEl.classList.add('invalid');
+            errors.push('Contact Email must be a valid email address');
+        }
+    }
+
+    // ── TMV Information ──
+    reqField('make', 'Make');
+    reqField('modelNo', 'Model No');
+    reqField('valveLocation', 'Location of Valve in Building');
+    reqRadio('compA', 'Compliance A - Drawings and Specifications');
+    reqRadio('compB', 'Compliance B - Manufacturer Instructions');
+    reqRadio('compC', 'Compliance C - Code of Practice');
+    reqRadio('compD', 'Compliance D - Water Authority / WRAS');
+
+    // ── Test Results ──
+    if (!val('passFail')) {
+        const pfGroup = document.getElementById('passFailGroup');
+        if (pfGroup) pfGroup.classList.add('invalid');
+        errors.push('Pass/Fail - Valve Satisfactory for Use');
+    }
+    reqField('tempHot', 'Temperature Hot');
+    reqField('tempCold', 'Temperature Cold');
+    reqField('pressHot', 'Pressure Hot');
+    reqField('pressCold', 'Pressure Cold');
+    reqField('tempOutlet', 'TMV Outlet Temperature');
+
+    // ── Plumber Sign-off ──
+    reqField('plumberName', "Plumber's Full Name");
+    reqField('plumberLicence', 'Plumber Licence No.');
+    reqField('signDate', 'Sign-off Date');
+
+    // Show/hide validation message
+    const msgEl = document.getElementById('validationMsg');
+    const listEl = document.getElementById('validationList');
+    if (errors.length > 0) {
+        listEl.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+        msgEl.style.display = 'block';
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Also scroll the first invalid field into view
+        const firstInvalid = document.querySelector('.invalid');
+        if (firstInvalid) {
+            setTimeout(() => firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+        }
+        return false;
+    }
+
+    msgEl.style.display = 'none';
+    return true;
 }
 
 // ══════════════════════════════════════════════════
@@ -691,6 +843,7 @@ function collectFormData() {
 }
 
 function generatePDF(returnBlob = false) {
+    if (!returnBlob && !validateForm()) return;
     const d = collectFormData();
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', 'a4');
@@ -1157,6 +1310,7 @@ function buildEmailHTML(d) {
 }
 
 async function generateAndEmail() {
+    if (!validateForm()) return;
     const recipientEmail = val('recipientEmail');
     const publicKey = val('ejsPublicKey');
     const serviceId = val('ejsServiceId');
