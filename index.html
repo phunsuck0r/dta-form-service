@@ -544,9 +544,16 @@
 
             <div class="pass-fail" id="passFailGroup" style="margin-top: 14px;">
                 <label>Valve Considered Satisfactory for Use: <span class="required-star">*</span></label>
-                <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed')">Passed</button>
-                <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed')">Failed</button>
+                <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed', 'passFail')">Passed</button>
+                <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed', 'passFail')">Failed</button>
                 <input type="hidden" id="passFail" value="">
+            </div>
+
+            <div class="pass-fail" id="failSafeGroup">
+                <label>Fail Safe Performance: <span class="required-star">*</span></label>
+                <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed', 'failSafe')">Passed</button>
+                <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed', 'failSafe')">Failed</button>
+                <input type="hidden" id="failSafe" value="">
             </div>
 
             <div style="margin-top:16px">
@@ -655,12 +662,12 @@ function radio(name) {
     return el ? el.value : '';
 }
 
-function togglePassFail(btn, type) {
-    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+function togglePassFail(btn, type, hiddenId) {
+    // Only clear siblings within the same pass-fail group
+    btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('passFail').value = type;
-    const pfGroup = document.getElementById('passFailGroup');
-    if (pfGroup) pfGroup.classList.remove('invalid');
+    document.getElementById(hiddenId).value = type;
+    btn.parentElement.classList.remove('invalid');
 }
 
 function selectForm(formType) {
@@ -695,6 +702,7 @@ function clearForm() {
     document.getElementById('tmvForm').reset();
     document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('passFail').value = '';
+    document.getElementById('failSafe').value = '';
     document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
     document.getElementById('validationMsg').style.display = 'none';
     setDefaultSignDate();
@@ -763,6 +771,11 @@ function validateForm() {
         if (pfGroup) pfGroup.classList.add('invalid');
         errors.push('Pass/Fail - Valve Satisfactory for Use');
     }
+    if (!val('failSafe')) {
+        const fsGroup = document.getElementById('failSafeGroup');
+        if (fsGroup) fsGroup.classList.add('invalid');
+        errors.push('Pass/Fail - Fail Safe Performance');
+    }
     reqField('tempHot', 'Temperature Hot');
     reqField('tempCold', 'Temperature Cold');
     reqField('pressHot', 'Pressure Hot');
@@ -828,6 +841,7 @@ function collectFormData() {
         chkORings: checked('chkORings'),
         chkTempSet: checked('chkTempSet'),
         passFail: val('passFail'),
+        failSafe: val('failSafe'),
         tempHot: val('tempHot'),
         tempCold: val('tempCold'),
         pressHot: val('pressHot'),
@@ -1019,6 +1033,15 @@ function generatePDF(returnBlob = false) {
     doc.setFont('helvetica', 'normal');
     doc.text('Passed', ml + cw*0.42 + 5, y + 2.5);
     checkBox(ml + cw*0.56, y, d.passFail === 'failed');
+    doc.text('Failed', ml + cw*0.56 + 5, y + 2.5);
+    y += 7;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Fail Safe Performance:', ml + 3, y + 2.5);
+    checkBox(ml + cw*0.42, y, d.failSafe === 'passed');
+    doc.setFont('helvetica', 'normal');
+    doc.text('Passed', ml + cw*0.42 + 5, y + 2.5);
+    checkBox(ml + cw*0.56, y, d.failSafe === 'failed');
     doc.text('Failed', ml + cw*0.56 + 5, y + 2.5);
     y += 8;
 
@@ -1228,6 +1251,16 @@ function buildEmailHTML(d) {
                             ${d.passFail === 'passed'
                                 ? '<span style="background:#d4edda;color:#155724;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:14px;">PASSED</span>'
                                 : d.passFail === 'failed'
+                                ? '<span style="background:#f8d7da;color:#721c24;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:14px;">FAILED</span>'
+                                : '<span style="color:#999;">Not specified</span>'}
+                        </td>
+                    </tr>
+                    <tr style="border-top:1px solid #eee;">
+                        <td style="padding:8px 0;font-weight:bold;color:#444;">Fail Safe Performance</td>
+                        <td style="padding:8px 0;text-align:right;">
+                            ${d.failSafe === 'passed'
+                                ? '<span style="background:#d4edda;color:#155724;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:14px;">PASSED</span>'
+                                : d.failSafe === 'failed'
                                 ? '<span style="background:#f8d7da;color:#721c24;padding:4px 14px;border-radius:4px;font-weight:bold;font-size:14px;">FAILED</span>'
                                 : '<span style="color:#999;">Not specified</span>'}
                         </td>
