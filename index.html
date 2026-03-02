@@ -408,8 +408,7 @@
     </div>
 
     <!-- Email config - hardcoded, hidden from engineers -->
-    <input type="hidden" id="recipientEmail" value="admin@dtaelectricalmechanical.co.uk">
-    <input type="hidden" id="recipientEmail2" value="marion.ashton@dtaelectricalmechanical.co.uk">
+    <input type="hidden" id="recipientEmail" value="admin@dtaelectricalmechanical.co.uk,marion.ashton@dtaelectricalmechanical.co.uk">
     <input type="hidden" id="ejsPublicKey" value="zyfJx9BujPpf4smFJ">
     <input type="hidden" id="ejsServiceId" value="service_u1gyn9g">
     <input type="hidden" id="ejsTemplateId" value="template_v4b2bkf">
@@ -1380,26 +1379,15 @@ async function generateAndEmail() {
         const yyyy = now.getFullYear();
         const subject = `TMV Commissioning Report - ${d.establishment || 'Unknown'} - ${dd}-${mm}-${yyyy}`;
         const htmlBody = buildEmailHTML(d);
-        const recipientEmail2 = val('recipientEmail2');
 
-        // Send to both recipients
-        const sendParams = {
+        await emailjs.send(serviceId, templateId, {
             to_email: recipientEmail,
             from_name: d.plumberName || 'DTA Engineer',
             subject: subject,
             message_html: htmlBody
-        };
+        });
 
-        await emailjs.send(serviceId, templateId, sendParams);
-
-        if (recipientEmail2) {
-            await emailjs.send(serviceId, templateId, {
-                ...sendParams,
-                to_email: recipientEmail2
-            });
-        }
-
-        showToast('Email sent successfully to both recipients', 'success');
+        showToast('Email sent successfully', 'success');
     } catch (err) {
         console.error('Email error:', err);
         showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
