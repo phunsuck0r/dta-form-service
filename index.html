@@ -409,13 +409,14 @@
 
     <!-- Email config - hardcoded, hidden from engineers -->
     <input type="hidden" id="recipientEmail" value="admin@dtaelectricalmechanical.co.uk">
+    <input type="hidden" id="recipientEmail2" value="marion.ashton@dtaelectricalmechanical.co.uk">
     <input type="hidden" id="ejsPublicKey" value="zyfJx9BujPpf4smFJ">
     <input type="hidden" id="ejsServiceId" value="service_u1gyn9g">
     <input type="hidden" id="ejsTemplateId" value="template_v4b2bkf">
 
     <div style="background:#e8f5e9;border:1.5px solid #4caf50;border-radius:10px;padding:12px 20px;margin-bottom:24px;display:flex;align-items:center;gap:10px;font-size:13px;">
         <span style="font-size:18px;">&#9993;</span>
-        <span>Completed forms will be emailed as PDF to <strong>admin@dtaelectricalmechanical.co.uk</strong></span>
+        <span>Completed forms will be emailed to <strong>admin@</strong> and <strong>marion.ashton@</strong> dtaelectricalmechanical.co.uk</span>
     </div>
 
     <!-- Validation Message -->
@@ -1379,15 +1380,26 @@ async function generateAndEmail() {
         const yyyy = now.getFullYear();
         const subject = `TMV Commissioning Report - ${d.establishment || 'Unknown'} - ${dd}-${mm}-${yyyy}`;
         const htmlBody = buildEmailHTML(d);
+        const recipientEmail2 = val('recipientEmail2');
 
-        await emailjs.send(serviceId, templateId, {
+        // Send to both recipients
+        const sendParams = {
             to_email: recipientEmail,
             from_name: d.plumberName || 'DTA Engineer',
             subject: subject,
             message_html: htmlBody
-        });
+        };
 
-        showToast('Email sent successfully to ' + recipientEmail, 'success');
+        await emailjs.send(serviceId, templateId, sendParams);
+
+        if (recipientEmail2) {
+            await emailjs.send(serviceId, templateId, {
+                ...sendParams,
+                to_email: recipientEmail2
+            });
+        }
+
+        showToast('Email sent successfully to both recipients', 'success');
     } catch (err) {
         console.error('Email error:', err);
         showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
