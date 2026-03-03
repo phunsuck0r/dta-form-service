@@ -477,22 +477,6 @@
                     <input type="text" id="streetAddress">
                 </div>
             </div>
-            <div class="field-row">
-                <div class="field-group">
-                    <label>Contact Person</label>
-                    <input type="text" id="contactPerson">
-                </div>
-                <div class="field-group">
-                    <label>Contact Number</label>
-                    <input type="tel" id="contactNumber" placeholder="e.g. 07700 900123">
-                </div>
-            </div>
-            <div class="field-row">
-                <div class="field-group">
-                    <label>Contact Person Email</label>
-                    <input type="email" id="contactEmail">
-                </div>
-            </div>
         </div>
 
         <!-- THERMOSTATIC MIXING VALVE INFORMATION -->
@@ -794,16 +778,6 @@ function validateForm() {
     reqField('establishment', 'Client');
     reqField('streetAddress', 'Site');
 
-    // Email format check (optional but validated if provided)
-    const emailEl = document.getElementById('contactEmail');
-    if (emailEl && emailEl.value.trim()) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailEl.value.trim())) {
-            emailEl.classList.add('invalid');
-            errors.push('Contact Email must be a valid email address');
-        }
-    }
-
     // ── TMV Information ──
     reqField('make', 'Make');
     reqField('modelNo', 'Model No');
@@ -858,9 +832,6 @@ function collectFormData() {
     return {
         establishment: val('establishment'),
         streetAddress: val('streetAddress'),
-        contactPerson: val('contactPerson'),
-        contactNumber: val('contactNumber'),
-        contactEmail: val('contactEmail'),
         make: val('make'),
         modelNo: val('modelNo'),
         serialNo: val('serialNo'),
@@ -963,11 +934,7 @@ function generatePDF(returnBlob = false) {
     fieldBox(ml, y, cw/2, 9, 'Client', d.establishment);
     fieldBox(ml + cw/2, y, cw/2, 9, 'Site', d.streetAddress);
     y += 9;
-    fieldBox(ml, y, cw/2, 9, 'Contact Person', d.contactPerson);
-    fieldBox(ml + cw/2, y, cw/2, 9, 'Contact Number', d.contactNumber);
-    y += 9;
-    fieldBox(ml, y, cw, 9, 'Contact Person Email', d.contactEmail);
-    y += 11;
+    y += 2;
 
     // ── VALVE INFORMATION ──
     sectionHeader('THERMOSTATIC MIXING VALVE INFORMATION');
@@ -1190,14 +1157,6 @@ function buildEmailHTML(d) {
                 <tr>
                     <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Site</td>
                     <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.streetAddress)}</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Contact Person</td>
-                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.contactPerson)} &nbsp; ${d.contactNumber ? '| ' + d.contactNumber : ''}</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Contact Email</td>
-                    <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.contactEmail)}</td>
                 </tr>
             </table>
         </div>
