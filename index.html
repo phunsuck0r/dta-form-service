@@ -1473,10 +1473,25 @@ function buildEmailHTML(d) {
     return `
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:0 auto;color:#1a1a2e;">
 
-        <!-- HEADER -->
-        <div style="background:#004E8C;color:white;padding:16px 24px;border-radius:8px 8px 0 0;">
-            <h1 style="margin:0;font-size:18px;letter-spacing:0.5px;">THERMOSTATIC MIXING VALVE</h1>
-            <p style="margin:4px 0 0;font-size:13px;opacity:0.8;">Commissioning / Maintenance Report</p>
+        <!-- COMPANY HEADER -->
+        <div style="background:#004E8C;color:white;padding:20px 24px;border-radius:8px 8px 0 0;">
+            <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="vertical-align:middle;width:80px;">
+                        <img src="https://dtaelectricalmechanical.co.uk/logo.png" alt="DTA" style="width:70px;height:auto;border-radius:6px;background:white;padding:4px;">
+                    </td>
+                    <td style="vertical-align:middle;padding-left:16px;">
+                        <h1 style="margin:0;font-size:18px;color:white;letter-spacing:0.5px;">DTA Electrical Mechanical</h1>
+                        <p style="margin:4px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">Store Room, The Old Mill, Kinoulton Rd, Cropwell Bishop, Nottingham NG12 3BE</p>
+                        <p style="margin:2px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">admin@dtaelectricalmechanical.co.uk</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- FORM TITLE -->
+        <div style="background:#0072CE;color:white;padding:10px 24px;">
+            <h2 style="margin:0;font-size:15px;letter-spacing:0.5px;">THERMOSTATIC MIXING VALVE</h2>
+            <p style="margin:2px 0 0;font-size:12px;opacity:0.85;">Commissioning / Maintenance Report</p>
         </div>
 
         <!-- SITE DETAILS -->
@@ -2072,9 +2087,23 @@ function gasBuildEmailHTML(d) {
     const row = (l, val) => `<tr><td style="padding:6px 16px;border-bottom:1px solid #eee;color:#666;width:220px;">${l}</td><td style="padding:6px 16px;border-bottom:1px solid #eee;">${val}</td></tr>`;
 
     return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:0 auto;color:#1a1a2e;">
-        <div style="background:#004E8C;color:white;padding:16px 24px;border-radius:8px 8px 0 0;">
-            <h1 style="margin:0;font-size:18px;">Non-Domestic Gas Testing and Purging</h1>
-            <p style="margin:4px 0 0;font-size:13px;opacity:0.8;">DTA Electrical Mechanical — Certificate</p>
+        <div style="background:#004E8C;color:white;padding:20px 24px;border-radius:8px 8px 0 0;">
+            <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="vertical-align:middle;width:80px;">
+                        <img src="https://dtaelectricalmechanical.co.uk/logo.png" alt="DTA" style="width:70px;height:auto;border-radius:6px;background:white;padding:4px;">
+                    </td>
+                    <td style="vertical-align:middle;padding-left:16px;">
+                        <h1 style="margin:0;font-size:18px;color:white;letter-spacing:0.5px;">DTA Electrical Mechanical</h1>
+                        <p style="margin:4px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">Store Room, The Old Mill, Kinoulton Rd, Cropwell Bishop, Nottingham NG12 3BE</p>
+                        <p style="margin:2px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">admin@dtaelectricalmechanical.co.uk</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="background:#0072CE;color:white;padding:10px 24px;">
+            <h2 style="margin:0;font-size:15px;">Non-Domestic Gas Testing and Purging</h2>
+            <p style="margin:2px 0 0;font-size:12px;opacity:0.85;">Certificate</p>
         </div>
         <div style="border:1px solid #ddd;border-top:none;">${sh('Company / Installer')}
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
