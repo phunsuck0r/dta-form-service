@@ -462,7 +462,7 @@
     </div>
 
     <!-- ═══════════════════ TMV FORM ═══════════════════ -->
-    <form id="tmvForm" class="form-container" onsubmit="return false;">
+    <form id="tmvForm" class="form-container" autocomplete="on" onsubmit="return false;">
 
         <!-- SITE DETAILS -->
         <div class="section-header">Site Details</div>
@@ -470,11 +470,11 @@
             <div class="field-row">
                 <div class="field-group">
                     <label>Client <span class="required-star">*</span></label>
-                    <input type="text" id="establishment">
+                    <input type="text" id="establishment" name="establishment">
                 </div>
                 <div class="field-group">
                     <label>Site <span class="required-star">*</span></label>
-                    <input type="text" id="streetAddress">
+                    <input type="text" id="streetAddress" name="streetAddress">
                 </div>
             </div>
         </div>
@@ -483,26 +483,26 @@
         <div class="section-header">Thermostatic Mixing Valve Information</div>
         <div class="section-body">
             <div class="field-row">
-                <div class="field-group"><label>Make <span class="required-star">*</span></label><input type="text" id="make"></div>
-                <div class="field-group"><label>Model No <span class="required-star">*</span></label><input type="text" id="modelNo"></div>
-                <div class="field-group"><label>Serial No</label><input type="text" id="serialNo"></div>
-                <div class="field-group"><label>Size (mm)</label><input type="text" id="size"></div>
+                <div class="field-group"><label>Make <span class="required-star">*</span></label><input type="text" id="make" name="make"></div>
+                <div class="field-group"><label>Model No <span class="required-star">*</span></label><input type="text" id="modelNo" name="modelNo"></div>
+                <div class="field-group"><label>Serial No</label><input type="text" id="serialNo" name="serialNo"></div>
+                <div class="field-group"><label>Size (mm)</label><input type="text" id="size" name="size"></div>
             </div>
             <div class="field-row">
-                <div class="field-group"><label>Valve No</label><input type="text" id="valveNo"></div>
-                <div class="field-group" style="flex:3"><label>Location of Valve in Building <span class="required-star">*</span></label><input type="text" id="valveLocation"></div>
+                <div class="field-group"><label>Valve No</label><input type="text" id="valveNo" name="valveNo"></div>
+                <div class="field-group" style="flex:3"><label>Location of Valve in Building <span class="required-star">*</span></label><input type="text" id="valveLocation" name="valveLocation"></div>
             </div>
 
             <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Number of outlets served by this valve:</p>
             <div class="field-row tight">
-                <div class="field-group"><label>Baths</label><input type="number" id="baths" min="0"></div>
-                <div class="field-group"><label>Basins</label><input type="number" id="basins" min="0"></div>
-                <div class="field-group"><label>Showers</label><input type="number" id="showers" min="0"></div>
+                <div class="field-group"><label>Baths</label><input type="number" id="baths" name="baths" min="0"></div>
+                <div class="field-group"><label>Basins</label><input type="number" id="basins" name="basins" min="0"></div>
+                <div class="field-group"><label>Showers</label><input type="number" id="showers" name="showers" min="0"></div>
             </div>
             <div class="field-row tight">
-                <div class="field-group"><label>Sinks</label><input type="number" id="sinks" min="0"></div>
-                <div class="field-group"><label>Other</label><input type="number" id="otherOutlets" min="0"></div>
-                <div class="field-group"><label>If Other, Specify</label><input type="text" id="otherSpecify"></div>
+                <div class="field-group"><label>Sinks</label><input type="number" id="sinks" name="sinks" min="0"></div>
+                <div class="field-group"><label>Other</label><input type="number" id="otherOutlets" name="otherOutlets" min="0"></div>
+                <div class="field-group"><label>If Other, Specify</label><input type="text" id="otherSpecify" name="otherSpecify"></div>
             </div>
 
             <p style="font-size:13px;font-weight:600;margin:16px 0 8px;color:#444">Mixing Valves installed in compliance with requirements of: <span class="required-star">*</span></p>
@@ -541,7 +541,7 @@
             <div class="field-row" style="margin-top:8px">
                 <div class="field-group">
                     <label>If No, provide the reason and the action taken</label>
-                    <textarea id="complianceReason"></textarea>
+                    <textarea id="complianceReason" name="complianceReason"></textarea>
                 </div>
             </div>
         </div>
@@ -577,19 +577,19 @@
                     <div class="reading-label">Temperature of Water Supply <span class="required-star">*</span></div>
                     <div class="reading-input">
                         <span>Hot</span>
-                        <input type="number" id="tempHot" step="0.1">
+                        <input type="number" id="tempHot" name="tempHot" step="0.1">
                         <span>°C</span>
                     </div>
                     <div class="reading-input">
                         <span>Cold</span>
-                        <input type="number" id="tempCold" step="0.1">
+                        <input type="number" id="tempCold" name="tempCold" step="0.1">
                         <span>°C</span>
                     </div>
                 </div>
                 <div class="reading-row">
                     <div class="reading-label">Temperature of Water at TMV Outlet <span class="required-star">*</span></div>
                     <div class="reading-input">
-                        <input type="number" id="tempOutlet" step="0.1">
+                        <input type="number" id="tempOutlet" name="tempOutlet" step="0.1">
                         <span>°C</span>
                     </div>
                 </div>
@@ -600,24 +600,24 @@
         <div class="section-header">Installation & Service Information</div>
         <div class="section-body">
             <div class="field-row">
-                <div class="field-group"><label>Date of Installation</label><input type="date" id="dateInstall"></div>
-                <div class="field-group"><label>Valve Installed By</label><input type="text" id="installedBy"></div>
+                <div class="field-group"><label>Date of Installation</label><input type="date" id="dateInstall" name="dateInstall"></div>
+                <div class="field-group"><label>Valve Installed By</label><input type="text" id="installedBy" name="installedBy"></div>
             </div>
             <div class="field-row">
-                <div class="field-group"><label>Date of Commissioning</label><input type="date" id="dateCommission"></div>
-                <div class="field-group"><label>Valve Commissioned By</label><input type="text" id="commissionedBy"></div>
+                <div class="field-group"><label>Date of Commissioning</label><input type="date" id="dateCommission" name="dateCommission"></div>
+                <div class="field-group"><label>Valve Commissioned By</label><input type="text" id="commissionedBy" name="commissionedBy"></div>
             </div>
             <div class="field-row">
-                <div class="field-group"><label>Date of Service</label><input type="date" id="dateService"></div>
-                <div class="field-group"><label>Valve Serviced By</label><input type="text" id="servicedBy"></div>
+                <div class="field-group"><label>Date of Service</label><input type="date" id="dateService" name="dateService"></div>
+                <div class="field-group"><label>Valve Serviced By</label><input type="text" id="servicedBy" name="servicedBy"></div>
             </div>
             <div class="field-row">
-                <div class="field-group"><label>Next Service Date</label><input type="date" id="nextServiceDate"></div>
+                <div class="field-group"><label>Next Service Date</label><input type="date" id="nextServiceDate" name="nextServiceDate"></div>
             </div>
             <div class="field-row">
                 <div class="field-group">
                     <label>Comments on the Installation</label>
-                    <textarea id="comments"></textarea>
+                    <textarea id="comments" name="comments"></textarea>
                 </div>
             </div>
         </div>
@@ -626,8 +626,8 @@
         <div class="section-header">Engineer Signature</div>
         <div class="section-body">
             <div class="field-row">
-                <div class="field-group"><label>Engineer's Full Name <span class="required-star">*</span></label><input type="text" id="plumberName"></div>
-                <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="signDate"></div>
+                <div class="field-group"><label>Engineer's Full Name <span class="required-star">*</span></label><input type="text" id="plumberName" name="plumberName"></div>
+                <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="signDate" name="signDate"></div>
             </div>
             <p style="font-size:11px;color:#888;margin-top:4px;font-style:italic">
                 It is hereby certified that all commissioning work has been carried out by the undersigned
