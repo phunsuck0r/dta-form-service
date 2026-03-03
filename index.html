@@ -433,13 +433,13 @@
     <div class="form-selector">
         <h2>Select Form Template</h2>
         <div class="form-cards">
-            <div class="form-card active" onclick="selectForm('tmv')">
+            <div class="form-card active" onclick="selectForm('tmv', this)">
                 <h3>TMV Commissioning Report</h3>
                 <p>Thermostatic Mixing Valve Commissioning / Maintenance Report</p>
             </div>
-            <div class="form-card" style="opacity:0.5;cursor:default;">
-                <h3>+ Add Template</h3>
-                <p>More form templates coming soon</p>
+            <div class="form-card" onclick="selectForm('gas', this)">
+                <h3>Gas Testing & Purging</h3>
+                <p>Non-Domestic Gas Testing and Purging Certificate</p>
             </div>
         </div>
     </div>
@@ -637,6 +637,318 @@
             <button type="button" class="btn btn-success" onclick="generateAndEmail()">Generate PDF & Email</button>
         </div>
     </form>
+
+    <!-- ═══════════════════ GAS TESTING & PURGING FORM ═══════════════════ -->
+    <form id="gasForm" class="form-container" autocomplete="on" onsubmit="return false;" style="display:none;">
+
+        <!-- COMPANY / INSTALLER -->
+        <div class="section-header">Company / Installer</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Engineer <span class="required-star">*</span></label><input type="text" id="gasEngineer" name="gasEngineer"></div>
+                <div class="field-group"><label>Gas Safe Reg No <span class="required-star">*</span></label><input type="text" id="gasGasSafeReg" name="gasGasSafeReg"></div>
+                <div class="field-group"><label>ID Card No</label><input type="text" id="gasIdCard" name="gasIdCard"></div>
+            </div>
+        </div>
+
+        <!-- JOB ADDRESS -->
+        <div class="section-header">Job Address</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Name <span class="required-star">*</span></label><input type="text" id="gasJobName" name="gasJobName"></div>
+                <div class="field-group" style="flex:2"><label>Address <span class="required-star">*</span></label><input type="text" id="gasJobAddress" name="gasJobAddress"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Post Code</label><input type="text" id="gasJobPostCode" name="gasJobPostCode"></div>
+                <div class="field-group"><label>Tel No</label><input type="tel" id="gasJobTel" name="gasJobTel"></div>
+            </div>
+        </div>
+
+        <!-- CLIENT / LANDLORD -->
+        <div class="section-header">Client / Landlord</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Name</label><input type="text" id="gasClientName" name="gasClientName"></div>
+                <div class="field-group"><label>Company</label><input type="text" id="gasClientCompany" name="gasClientCompany"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group" style="flex:2"><label>Address</label><input type="text" id="gasClientAddress" name="gasClientAddress"></div>
+                <div class="field-group"><label>Post Code</label><input type="text" id="gasClientPostCode" name="gasClientPostCode"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Tel No</label><input type="tel" id="gasClientTel" name="gasClientTel"></div>
+            </div>
+        </div>
+
+        <!-- STRENGTH TEST DETAILS -->
+        <div class="section-header">Strength Test Details</div>
+        <div class="section-body">
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">State Test Method</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasTestMethod" value="Pneumatic"> Pneumatic</label>
+                        <label class="radio-option"><input type="radio" name="gasTestMethod" value="Hydrostatic"> Hydrostatic</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">Installation</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasStrInstall" value="New"> New</label>
+                        <label class="radio-option"><input type="radio" name="gasStrInstall" value="New Extension"> New Extension</label>
+                        <label class="radio-option"><input type="radio" name="gasStrInstall" value="Existing"> Existing</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">Components not suitable for strength testing removed/isolated?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasCompRemoved" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasCompRemoved" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Calculated STP (mbar)</label><input type="number" id="gasCalcSTP" name="gasCalcSTP" step="0.1"></div>
+                <div class="field-group"><label>Test Medium</label><input type="text" id="gasStrMedium" name="gasStrMedium"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Stabilisation Period (mins)</label><input type="number" id="gasStrStab" name="gasStrStab"></div>
+                <div class="field-group"><label>Strength Test Duration (mins)</label><input type="number" id="gasSTD" name="gasSTD"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Permitted Pressure Drop (% STP)</label><input type="number" id="gasPermDrop" name="gasPermDrop" step="0.1"></div>
+                <div class="field-group"><label>Calculated Pressure Drop (mbar)</label><input type="number" id="gasCalcDrop" name="gasCalcDrop" step="0.1"></div>
+            </div>
+            <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Findings</p>
+            <div class="field-row">
+                <div class="field-group"><label>Actual Pressure Drop (mbar)</label><input type="text" id="gasActualStrDrop" name="gasActualStrDrop"></div>
+            </div>
+            <div class="pass-fail" id="gasStrPassGroup">
+                <label>STRENGTH TEST: <span class="required-star">*</span></label>
+                <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed', 'gasStrPass')">Pass</button>
+                <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed', 'gasStrPass')">Fail</button>
+                <input type="hidden" id="gasStrPass" value="">
+            </div>
+        </div>
+
+        <!-- TIGHTNESS TEST DETAILS -->
+        <div class="section-header">Tightness Test Details</div>
+        <div class="section-body">
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">Gas Type</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasGasType" value="Natural Gas"> Natural Gas</label>
+                        <label class="radio-option"><input type="radio" name="gasGasType" value="LPG"> Liquefied Petroleum Gas</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">Installation</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasTightInstall" value="New"> New</label>
+                        <label class="radio-option"><input type="radio" name="gasTightInstall" value="New Extension"> New Extension</label>
+                        <label class="radio-option"><input type="radio" name="gasTightInstall" value="Existing"> Existing</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">Could weather or changes in temperature affect the test?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasWeather" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasWeather" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Meter Type</label><input type="text" id="gasMeterType" name="gasMeterType"></div>
+                <div class="field-group"><label>Meter Model</label><input type="text" id="gasMeterModel" name="gasMeterModel"></div>
+            </div>
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">Meter bypass installed</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasMeterBypass" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasMeterBypass" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Installation Volume</p>
+            <div class="field-row">
+                <div class="field-group"><label>Gas Meter (m&sup3;)</label><input type="number" id="gasIVMeter" name="gasIVMeter" step="0.0001"></div>
+                <div class="field-group"><label>Pipework & Fittings (m&sup3;)</label><input type="number" id="gasIVPipe" name="gasIVPipe" step="0.0001"></div>
+                <div class="field-group"><label>Total IV (m&sup3;)</label><input type="number" id="gasIVTotal" name="gasIVTotal" step="0.0001"></div>
+            </div>
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">Test Medium</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasTightMedium" value="Fuel"> Fuel</label>
+                        <label class="radio-option"><input type="radio" name="gasTightMedium" value="Gas"> Gas</label>
+                        <label class="radio-option"><input type="radio" name="gasTightMedium" value="Air"> Air</label>
+                    </div>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Tightness Test Pressure TTP (mbar)</label><input type="number" id="gasTTP" name="gasTTP" step="0.1"></div>
+                <div class="field-group"><label>Pressure Gauge Type</label><input type="text" id="gasGaugeType" name="gasGaugeType"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>MPLR / MAPD</label><input type="text" id="gasMPLR" name="gasMPLR"></div>
+                <div class="field-group"><label>Let-by Test Period (mins)</label><input type="number" id="gasLetBy" name="gasLetBy"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Stabilisation Period (mins)</label><input type="number" id="gasTightStab" name="gasTightStab"></div>
+                <div class="field-group"><label>Tightness Test Duration TTD (mins)</label><input type="number" id="gasTTD" name="gasTTD"></div>
+            </div>
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">Any inadequately ventilated areas to check?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasVentCheck" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasVentCheck" value="no"> No</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">Is barometric pressure correction necessary?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasBarometric" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasBarometric" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Findings</p>
+            <div class="field-row">
+                <div class="field-group"><label>Actual Leak Rate (m&sup3;/hr)</label><input type="text" id="gasActualLeak" name="gasActualLeak"></div>
+                <div class="field-group"><label>Actual Pressure Drop (mbar)</label><input type="text" id="gasActualTightDrop" name="gasActualTightDrop"></div>
+            </div>
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">Have inadequately ventilated areas been checked?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasVentChecked" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasVentChecked" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+            <div class="pass-fail" id="gasTightPassGroup">
+                <label>TIGHTNESS TEST: <span class="required-star">*</span></label>
+                <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed', 'gasTightPass')">Pass</button>
+                <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed', 'gasTightPass')">Fail</button>
+                <input type="hidden" id="gasTightPass" value="">
+            </div>
+        </div>
+
+        <!-- PURGING PROCEDURE DETAILS -->
+        <div class="section-header">Purging Procedure Details</div>
+        <div class="section-body">
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">Has a risk assessment been carried out?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasRiskAssess" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasRiskAssess" value="no"> No</label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label">Has a written procedure for the purge been prepared?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasWrittenProc" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasWrittenProc" value="no"> No</label>
+                        <label class="radio-option"><input type="radio" name="gasWrittenProc" value="na"> N/A</label>
+                    </div>
+                </div>
+            </div>
+            <div class="checkbox-grid" style="grid-template-columns:1fr 1fr;">
+                <label class="checkbox-item"><input type="checkbox" id="gasNoSmoking"> 'NO SMOKING' signs displayed</label>
+                <label class="checkbox-item"><input type="checkbox" id="gasPersonsAdvised"> Persons in vicinity advised</label>
+                <label class="checkbox-item"><input type="checkbox" id="gasValvesLabeled"> Valves to/from section labeled</label>
+                <label class="checkbox-item"><input type="checkbox" id="gasNitrogenChecked"> Nitrogen cylinders checked/verified</label>
+                <label class="checkbox-item"><input type="checkbox" id="gasElecBands"> Electrical bands fitted</label>
+                <label class="checkbox-item"><input type="checkbox" id="gasDetectorSafe"> Gas detector intrinsically safe</label>
+            </div>
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label">Are two way radios (intrinsically safe) available?</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasRadios" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="gasRadios" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Calculate Purge Volume</p>
+            <div class="field-row">
+                <div class="field-group"><label>Gas Meter (m&sup3;)</label><input type="number" id="gasPVMeter" name="gasPVMeter" step="0.0001"></div>
+                <div class="field-group"><label>Pipework & Fittings (m&sup3;)</label><input type="number" id="gasPVPipe" name="gasPVPipe" step="0.0001"></div>
+                <div class="field-group"><label>Total Purge Volume (m&sup3;)</label><input type="number" id="gasPVTotal" name="gasPVTotal" step="0.0001"></div>
+            </div>
+            <p style="font-size:13px;font-weight:600;margin:12px 0 8px;color:#444">Findings</p>
+            <div class="field-row">
+                <div class="field-group"><label>Final Test Criteria Readings (GIA%)</label><input type="text" id="gasGIA" name="gasGIA"></div>
+            </div>
+            <div class="pass-fail" id="gasPurgePassGroup">
+                <label>PURGE: <span class="required-star">*</span></label>
+                <button type="button" class="toggle-btn passed" onclick="togglePassFail(this, 'passed', 'gasPurgePass')">Pass</button>
+                <button type="button" class="toggle-btn failed" onclick="togglePassFail(this, 'failed', 'gasPurgePass')">Fail</button>
+                <input type="hidden" id="gasPurgePass" value="">
+            </div>
+        </div>
+
+        <!-- INDICATE WORK UNDERTAKEN -->
+        <div class="section-header">Indicate Work Undertaken</div>
+        <div class="section-body">
+            <div class="checkbox-grid" style="grid-template-columns:repeat(3,1fr);">
+                <label class="checkbox-item"><input type="checkbox" id="gasWorkStrength"> Strength Test</label>
+                <label class="checkbox-item"><input type="checkbox" id="gasWorkTightness"> Tightness Test</label>
+                <label class="checkbox-item"><input type="checkbox" id="gasWorkPurge"> Purge</label>
+            </div>
+        </div>
+
+        <!-- DECLARATION -->
+        <div class="section-header">Declaration</div>
+        <div class="section-body">
+            <div class="compliance-table">
+                <div class="compliance-row">
+                    <div class="compliance-label" style="font-size:12px;"><strong>DECLARATION OF GAS SAFETY</strong> — I confirm that all work has been satisfactorily completed in accordance with current Gas Safety (Installation and Use) Regulations, industry standards and procedures.</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasDeclaration" value="safe"> <strong>Safe</strong></label>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <div class="compliance-label" style="font-size:12px;"><strong>NOTIFICATION OF UNSAFE INSTALLATION</strong> — Work completed as above, however an unsafe gas installation has been identified (details on separate Warning/Advice Notice).</div>
+                    <div class="compliance-options">
+                        <label class="radio-option"><input type="radio" name="gasDeclaration" value="unsafe"> <strong>Unsafe</strong></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENGINEER COMMENTS -->
+        <div class="section-header">Engineer Comments</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group">
+                    <textarea id="gasComments" name="gasComments" style="min-height:80px"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIGNATURES -->
+        <div class="section-header">Signatures</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Issued By (Print Name) <span class="required-star">*</span></label><input type="text" id="gasIssuedBy" name="gasIssuedBy"></div>
+                <div class="field-group"><label>Received By (Print Name)</label><input type="text" id="gasReceivedBy" name="gasReceivedBy"></div>
+                <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="gasSignDate" name="gasSignDate"></div>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+            <button type="button" class="btn btn-secondary" onclick="gasClearForm()">Clear Form</button>
+            <button type="button" class="btn btn-primary" onclick="gasGeneratePDF()">Download PDF</button>
+            <button type="button" class="btn btn-success" onclick="gasGenerateAndEmail()">Generate PDF & Email</button>
+        </div>
+    </form>
+
 </div>
 
 <!-- ═══════════════════ SUCCESS PAGE ═══════════════════ -->
@@ -650,7 +962,7 @@
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <h2 style="font-size:24px;color:#004E8C;margin-bottom:8px;">Form Sent Successfully</h2>
-        <p style="font-size:14px;color:#666;margin-bottom:8px;">The TMV Commissioning Report has been emailed to the office.</p>
+        <p id="successMsg" style="font-size:14px;color:#666;margin-bottom:8px;">The report has been emailed to the office.</p>
         <p id="successDetail" style="font-size:13px;color:#888;margin-bottom:32px;"></p>
         <button onclick="dismissSuccess()" style="
             background:#0072CE;color:white;border:none;padding:12px 32px;
@@ -718,10 +1030,15 @@ function togglePassFail(btn, type, hiddenId) {
     btn.parentElement.classList.remove('invalid');
 }
 
-function selectForm(formType) {
-    // For future expansion with multiple forms
+let activeFormType = 'tmv';
+function selectForm(formType, card) {
+    activeFormType = formType;
     document.querySelectorAll('.form-card').forEach(c => c.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    card.classList.add('active');
+    document.getElementById('tmvForm').style.display = formType === 'tmv' ? '' : 'none';
+    document.getElementById('gasForm').style.display = formType === 'gas' ? '' : 'none';
+    document.getElementById('validationMsg').style.display = 'none';
+    if (formType === 'gas') gasSetDefaultDate();
 }
 
 // Clear invalid styling on user input
@@ -1391,7 +1708,7 @@ async function generateAndEmail() {
             message_html: htmlBody
         });
 
-        showSuccess(d.establishment);
+        showSuccess(d.establishment, 'TMV Commissioning Report');
     } catch (err) {
         console.error('Email error:', err);
         showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
@@ -1402,18 +1719,467 @@ async function generateAndEmail() {
     }
 }
 
-function showSuccess(client) {
+function showSuccess(client, formLabel) {
     const detail = document.getElementById('successDetail');
+    const msg = document.getElementById('successMsg');
     const now = new Date();
     const timeStr = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
     detail.textContent = (client ? client + ' — ' : '') + 'Sent at ' + timeStr;
-    const overlay = document.getElementById('successOverlay');
-    overlay.style.display = 'flex';
+    msg.textContent = (formLabel || 'The report') + ' has been emailed to the office.';
+    document.getElementById('successOverlay').style.display = 'flex';
 }
 
 function dismissSuccess() {
     document.getElementById('successOverlay').style.display = 'none';
-    clearForm();
+    if (activeFormType === 'gas') gasClearForm(); else clearForm();
+}
+
+// ══════════════════════════════════════════════════
+// GAS TESTING & PURGING FORM
+// ══════════════════════════════════════════════════
+function gasSetDefaultDate() {
+    const el = document.getElementById('gasSignDate');
+    if (el && !el.value) el.value = new Date().toISOString().slice(0, 10);
+}
+
+function gasClearForm() {
+    document.getElementById('gasForm').reset();
+    document.querySelectorAll('#gasForm .toggle-btn').forEach(b => b.classList.remove('active'));
+    ['gasStrPass','gasTightPass','gasPurgePass'].forEach(id => document.getElementById(id).value = '');
+    document.querySelectorAll('#gasForm .invalid').forEach(el => el.classList.remove('invalid'));
+    document.getElementById('validationMsg').style.display = 'none';
+    gasSetDefaultDate();
+    showToast('Form cleared');
+}
+
+function gasValidateForm() {
+    const errors = [];
+    document.querySelectorAll('#gasForm .invalid').forEach(el => el.classList.remove('invalid'));
+
+    function reqField(id, label) {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) { if (el) el.classList.add('invalid'); errors.push(label); }
+    }
+    function reqHidden(id, groupId, label) {
+        if (!val(id)) {
+            const g = document.getElementById(groupId);
+            if (g) g.classList.add('invalid');
+            errors.push(label);
+        }
+    }
+
+    reqField('gasEngineer', 'Engineer');
+    reqField('gasGasSafeReg', 'Gas Safe Reg No');
+    reqField('gasJobName', 'Job Name');
+    reqField('gasJobAddress', 'Job Address');
+    reqHidden('gasStrPass', 'gasStrPassGroup', 'Strength Test Pass/Fail');
+    reqHidden('gasTightPass', 'gasTightPassGroup', 'Tightness Test Pass/Fail');
+    reqHidden('gasPurgePass', 'gasPurgePassGroup', 'Purge Pass/Fail');
+    reqField('gasIssuedBy', 'Issued By');
+    reqField('gasSignDate', 'Date');
+
+    const msgEl = document.getElementById('validationMsg');
+    const listEl = document.getElementById('validationList');
+    if (errors.length > 0) {
+        listEl.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+        msgEl.style.display = 'block';
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const firstInvalid = document.querySelector('#gasForm .invalid');
+        if (firstInvalid) setTimeout(() => firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+        return false;
+    }
+    msgEl.style.display = 'none';
+    return true;
+}
+
+function gasCollectFormData() {
+    return {
+        engineer: val('gasEngineer'), gasSafeReg: val('gasGasSafeReg'), idCard: val('gasIdCard'),
+        jobName: val('gasJobName'), jobAddress: val('gasJobAddress'), jobPostCode: val('gasJobPostCode'), jobTel: val('gasJobTel'),
+        clientName: val('gasClientName'), clientCompany: val('gasClientCompany'), clientAddress: val('gasClientAddress'), clientPostCode: val('gasClientPostCode'), clientTel: val('gasClientTel'),
+        testMethod: radio('gasTestMethod'), strInstall: radio('gasStrInstall'), compRemoved: radio('gasCompRemoved'),
+        calcSTP: val('gasCalcSTP'), strMedium: val('gasStrMedium'), strStab: val('gasStrStab'), std: val('gasSTD'),
+        permDrop: val('gasPermDrop'), calcDrop: val('gasCalcDrop'), actualStrDrop: val('gasActualStrDrop'), strPass: val('gasStrPass'),
+        gasType: radio('gasGasType'), tightInstall: radio('gasTightInstall'), weather: radio('gasWeather'),
+        meterType: val('gasMeterType'), meterModel: val('gasMeterModel'), meterBypass: radio('gasMeterBypass'),
+        ivMeter: val('gasIVMeter'), ivPipe: val('gasIVPipe'), ivTotal: val('gasIVTotal'),
+        tightMedium: radio('gasTightMedium'), ttp: val('gasTTP'), gaugeType: val('gasGaugeType'),
+        mplr: val('gasMPLR'), letBy: val('gasLetBy'), tightStab: val('gasTightStab'), ttd: val('gasTTD'),
+        ventCheck: radio('gasVentCheck'), barometric: radio('gasBarometric'),
+        actualLeak: val('gasActualLeak'), actualTightDrop: val('gasActualTightDrop'), ventChecked: radio('gasVentChecked'), tightPass: val('gasTightPass'),
+        riskAssess: radio('gasRiskAssess'), writtenProc: radio('gasWrittenProc'),
+        noSmoking: checked('gasNoSmoking'), personsAdvised: checked('gasPersonsAdvised'), valvesLabeled: checked('gasValvesLabeled'),
+        nitrogenChecked: checked('gasNitrogenChecked'), elecBands: checked('gasElecBands'), detectorSafe: checked('gasDetectorSafe'),
+        radios: radio('gasRadios'),
+        pvMeter: val('gasPVMeter'), pvPipe: val('gasPVPipe'), pvTotal: val('gasPVTotal'),
+        gia: val('gasGIA'), purgePass: val('gasPurgePass'),
+        workStrength: checked('gasWorkStrength'), workTightness: checked('gasWorkTightness'), workPurge: checked('gasWorkPurge'),
+        declaration: radio('gasDeclaration'),
+        comments: val('gasComments'),
+        issuedBy: val('gasIssuedBy'), receivedBy: val('gasReceivedBy'), signDate: val('gasSignDate')
+    };
+}
+
+function gasGeneratePDF(returnBlob = false) {
+    if (!returnBlob && !gasValidateForm()) return;
+    const d = gasCollectFormData();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pw = 210, ph = 297, ml = 10, mr = pw - 10;
+    const cw = mr - ml;
+    let y = 10;
+    const darkBg = [0, 78, 140];
+    const pf = (v) => v === 'passed' ? 'Pass' : v === 'failed' ? 'Fail' : '';
+    const ynText = (v) => v === 'yes' ? 'Yes' : v === 'no' ? 'No' : v === 'na' ? 'N/A' : '';
+
+    // Title
+    doc.setFillColor(...darkBg);
+    doc.rect(ml, y, cw * 0.75, 12, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Non-Domestic Gas Testing and Purging', ml + 4, y + 7.5);
+    doc.setTextColor(0,0,0);
+    // Cert no
+    doc.setDrawColor(150);
+    doc.rect(ml + cw*0.75, y, cw*0.25, 12);
+    doc.setFontSize(7); doc.setFont('helvetica','normal');
+    doc.text('Cert. No.', ml + cw*0.75 + 2, y + 5);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    const certNo = String(Math.floor(Math.random()*9000)+1000);
+    doc.text(certNo, ml + cw*0.75 + 2, y + 10);
+    y += 14;
+
+    // Company header
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text('DTA Electrical Mechanical', ml + 2, y);
+    y += 5;
+
+    function sectionHeader(text) {
+        doc.setFillColor(...darkBg);
+        doc.rect(ml, y, cw, 6, 'F');
+        doc.setTextColor(255,255,255);
+        doc.setFont('helvetica','bold'); doc.setFontSize(8);
+        doc.text(text, ml + 2, y + 4.2);
+        doc.setTextColor(0,0,0);
+        y += 7;
+    }
+
+    function fieldBox(x, yp, w, h, label, value) {
+        doc.setDrawColor(180); doc.rect(x, yp, w, h);
+        doc.setFont('helvetica','normal'); doc.setFontSize(5.5); doc.setTextColor(100);
+        doc.text(label, x + 1, yp + 3);
+        doc.setTextColor(0); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+        if (value) doc.text(String(value), x + 1.5, yp + h - 1.5);
+    }
+
+    function checkBox(x, yp, isChecked) {
+        doc.setDrawColor(150); doc.rect(x, yp, 3, 3);
+        if (isChecked) { doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.text('X', x + 0.4, yp + 2.5); }
+    }
+
+    function labelVal(x, yp, label, value) {
+        doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(80);
+        doc.text(label, x, yp);
+        doc.setTextColor(0); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+        if (value) doc.text(String(value), x + doc.getTextWidth(label) + 2, yp);
+    }
+
+    // ── THREE COLUMN HEADER ──
+    const colW = cw / 3;
+    sectionHeader('Company / Installer');
+    fieldBox(ml, y, colW, 7, 'Engineer', d.engineer);
+    fieldBox(ml+colW, y, colW, 7, 'Gas Safe Reg No', d.gasSafeReg);
+    fieldBox(ml+colW*2, y, colW, 7, 'ID Card No', d.idCard);
+    y += 8;
+
+    // Job Address
+    sectionHeader('Job Address');
+    fieldBox(ml, y, colW, 7, 'Name', d.jobName);
+    fieldBox(ml+colW, y, colW*2, 7, 'Address', d.jobAddress);
+    y += 7;
+    fieldBox(ml, y, colW, 7, 'Post Code', d.jobPostCode);
+    fieldBox(ml+colW, y, colW, 7, 'Tel No', d.jobTel);
+    y += 8;
+
+    // Client / Landlord
+    sectionHeader('Client / Landlord');
+    fieldBox(ml, y, colW, 7, 'Name', d.clientName);
+    fieldBox(ml+colW, y, colW*2, 7, 'Company', d.clientCompany);
+    y += 7;
+    fieldBox(ml, y, colW*2, 7, 'Address', d.clientAddress);
+    fieldBox(ml+colW*2, y, colW, 7, 'Post Code', d.clientPostCode);
+    y += 8;
+
+    // ── STRENGTH TEST ──
+    sectionHeader('Strength Test Details');
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    doc.text('Test Method:', ml+2, y+2.5); checkBox(ml+22, y+0.5, d.testMethod==='Pneumatic'); doc.text('Pneumatic', ml+26, y+2.5);
+    checkBox(ml+45, y+0.5, d.testMethod==='Hydrostatic'); doc.text('Hydrostatic', ml+49, y+2.5);
+    doc.text('Installation:', ml+70, y+2.5); checkBox(ml+88, y+0.5, d.strInstall==='New'); doc.text('New', ml+92, y+2.5);
+    checkBox(ml+102, y+0.5, d.strInstall==='New Extension'); doc.text('New Extension', ml+106, y+2.5);
+    checkBox(ml+130, y+0.5, d.strInstall==='Existing'); doc.text('Existing', ml+134, y+2.5);
+    y += 5;
+    doc.text('Components removed/isolated:', ml+2, y+2.5);
+    checkBox(ml+52, y+0.5, d.compRemoved==='yes'); doc.text('Yes', ml+56, y+2.5);
+    checkBox(ml+66, y+0.5, d.compRemoved==='no'); doc.text('No', ml+70, y+2.5);
+    y += 5;
+    fieldBox(ml, y, colW, 7, 'Calculated STP (mbar)', d.calcSTP);
+    fieldBox(ml+colW, y, colW, 7, 'Test Medium', d.strMedium);
+    fieldBox(ml+colW*2, y, colW, 7, 'Stabilisation Period (mins)', d.strStab);
+    y += 7;
+    fieldBox(ml, y, colW, 7, 'STD (mins)', d.std);
+    fieldBox(ml+colW, y, colW, 7, 'Permitted Drop (% STP)', d.permDrop);
+    fieldBox(ml+colW*2, y, colW, 7, 'Calculated Drop (mbar)', d.calcDrop);
+    y += 8;
+    doc.setFont('helvetica','bold'); doc.setFontSize(6.5);
+    doc.text('Findings:', ml+2, y+2);
+    fieldBox(ml+20, y-1, 30, 6, 'Actual Pressure Drop', d.actualStrDrop); doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.text('mbar', ml+52, y+3);
+    doc.setFont('helvetica','bold'); doc.text('STRENGTH TEST', ml+70, y+3);
+    checkBox(ml+105, y, d.strPass==='passed'); doc.setFont('helvetica','normal'); doc.text('Pass', ml+109, y+2.5);
+    checkBox(ml+120, y, d.strPass==='failed'); doc.text('Fail', ml+124, y+2.5);
+    y += 8;
+
+    // ── TIGHTNESS TEST ──
+    sectionHeader('Tightness Test Details');
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    doc.text('Gas Type:', ml+2, y+2.5); checkBox(ml+18, y+0.5, d.gasType==='Natural Gas'); doc.text('Natural Gas', ml+22, y+2.5);
+    checkBox(ml+45, y+0.5, d.gasType==='LPG'); doc.text('LPG', ml+49, y+2.5);
+    doc.text('Installation:', ml+70, y+2.5); checkBox(ml+88, y+0.5, d.tightInstall==='New'); doc.text('New', ml+92, y+2.5);
+    checkBox(ml+102, y+0.5, d.tightInstall==='New Extension'); doc.text('New Extension', ml+106, y+2.5);
+    checkBox(ml+130, y+0.5, d.tightInstall==='Existing'); doc.text('Existing', ml+134, y+2.5);
+    y += 5;
+    doc.text('Weather/temp effect:', ml+2, y+2.5); checkBox(ml+35, y+0.5, d.weather==='yes'); doc.text('Yes', ml+39, y+2.5);
+    checkBox(ml+49, y+0.5, d.weather==='no'); doc.text('No', ml+53, y+2.5);
+    y += 5;
+    fieldBox(ml, y, colW, 7, 'Meter Type', d.meterType);
+    fieldBox(ml+colW, y, colW, 7, 'Meter Model', d.meterModel);
+    doc.text('Bypass:', ml+colW*2+2, y+3); checkBox(ml+colW*2+15, y+1, d.meterBypass==='yes'); doc.text('Yes', ml+colW*2+19, y+3); checkBox(ml+colW*2+29, y+1, d.meterBypass==='no'); doc.text('No', ml+colW*2+33, y+3);
+    y += 8;
+    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); doc.text('Installation Volume:', ml+2, y+2);
+    y += 3;
+    fieldBox(ml, y, colW, 7, 'Gas Meter (m\u00B3)', d.ivMeter);
+    fieldBox(ml+colW, y, colW, 7, 'Pipework (m\u00B3)', d.ivPipe);
+    fieldBox(ml+colW*2, y, colW, 7, 'Total IV (m\u00B3)', d.ivTotal);
+    y += 8;
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    doc.text('Test Medium:', ml+2, y+2.5); checkBox(ml+22, y+0.5, d.tightMedium==='Fuel'); doc.text('Fuel', ml+26, y+2.5);
+    checkBox(ml+38, y+0.5, d.tightMedium==='Gas'); doc.text('Gas', ml+42, y+2.5);
+    checkBox(ml+52, y+0.5, d.tightMedium==='Air'); doc.text('Air', ml+56, y+2.5);
+    y += 5;
+    fieldBox(ml, y, colW, 7, 'TTP (mbar)', d.ttp);
+    fieldBox(ml+colW, y, colW, 7, 'Pressure Gauge Type', d.gaugeType);
+    fieldBox(ml+colW*2, y, colW, 7, 'MPLR/MAPD', d.mplr);
+    y += 7;
+    fieldBox(ml, y, colW, 7, 'Let-by Period (mins)', d.letBy);
+    fieldBox(ml+colW, y, colW, 7, 'Stabilisation (mins)', d.tightStab);
+    fieldBox(ml+colW*2, y, colW, 7, 'TTD (mins)', d.ttd);
+    y += 8;
+    doc.text('Ventilated areas to check:', ml+2, y+2.5); checkBox(ml+45, y+0.5, d.ventCheck==='yes'); doc.text('Yes', ml+49, y+2.5); checkBox(ml+59, y+0.5, d.ventCheck==='no'); doc.text('No', ml+63, y+2.5);
+    doc.text('Barometric correction:', ml+80, y+2.5); checkBox(ml+115, y+0.5, d.barometric==='yes'); doc.text('Yes', ml+119, y+2.5); checkBox(ml+129, y+0.5, d.barometric==='no'); doc.text('No', ml+133, y+2.5);
+    y += 6;
+    doc.setFont('helvetica','bold'); doc.text('Findings:', ml+2, y+2);
+    fieldBox(ml+20, y-1, 25, 6, 'Leak Rate (m\u00B3/hr)', d.actualLeak);
+    fieldBox(ml+50, y-1, 30, 6, 'Pressure Drop (mbar)', d.actualTightDrop);
+    doc.text('Vent. areas checked:', ml+85, y+3); checkBox(ml+120, y, d.ventChecked==='yes'); doc.setFont('helvetica','normal'); doc.text('Yes', ml+124, y+2.5); checkBox(ml+134, y, d.ventChecked==='no'); doc.text('No', ml+138, y+2.5);
+    y += 7;
+    doc.setFont('helvetica','bold'); doc.text('TIGHTNESS TEST', ml+70, y+2);
+    checkBox(ml+105, y-0.5, d.tightPass==='passed'); doc.setFont('helvetica','normal'); doc.text('Pass', ml+109, y+2);
+    checkBox(ml+120, y-0.5, d.tightPass==='failed'); doc.text('Fail', ml+124, y+2);
+    y += 6;
+
+    // ── PURGING ──
+    sectionHeader('Purging Procedure Details');
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.5);
+    doc.text('Risk assessment:', ml+2, y+2.5); checkBox(ml+28, y+0.5, d.riskAssess==='yes'); doc.text('Yes', ml+32, y+2.5); checkBox(ml+42, y+0.5, d.riskAssess==='no'); doc.text('No', ml+46, y+2.5);
+    doc.text('Written procedure:', ml+60, y+2.5); checkBox(ml+88, y+0.5, d.writtenProc==='yes'); doc.text('Yes', ml+92, y+2.5); checkBox(ml+102, y+0.5, d.writtenProc==='no'); doc.text('No', ml+106, y+2.5); checkBox(ml+116, y+0.5, d.writtenProc==='na'); doc.text('N/A', ml+120, y+2.5);
+    y += 5;
+    const purgeChecks = [
+        ["'NO SMOKING' signs displayed", d.noSmoking], ['Persons in vicinity advised', d.personsAdvised],
+        ['Valves labeled', d.valvesLabeled], ['Nitrogen cylinders checked', d.nitrogenChecked],
+        ['Electrical bands fitted', d.elecBands], ['Gas detector safe', d.detectorSafe]
+    ];
+    purgeChecks.forEach((pc, i) => {
+        const cx = (i % 2 === 0) ? ml + 2 : ml + cw/2;
+        const cy = y + Math.floor(i/2) * 4;
+        checkBox(cx, cy, pc[1]); doc.text(pc[0], cx + 4, cy + 2.5);
+    });
+    y += Math.ceil(purgeChecks.length/2) * 4 + 1;
+    doc.text('Two way radios:', ml+2, y+2.5); checkBox(ml+28, y+0.5, d.radios==='yes'); doc.text('Yes', ml+32, y+2.5); checkBox(ml+42, y+0.5, d.radios==='no'); doc.text('No', ml+46, y+2.5);
+    y += 5;
+    doc.setFont('helvetica','bold'); doc.text('Purge Volume:', ml+2, y+2);
+    y += 3;
+    fieldBox(ml, y, colW, 7, 'Gas Meter (m\u00B3)', d.pvMeter);
+    fieldBox(ml+colW, y, colW, 7, 'Pipework (m\u00B3)', d.pvPipe);
+    fieldBox(ml+colW*2, y, colW, 7, 'Total (m\u00B3)', d.pvTotal);
+    y += 8;
+    doc.setFont('helvetica','bold'); doc.text('Findings:', ml+2, y+2);
+    fieldBox(ml+20, y-1, 25, 6, 'GIA%', d.gia);
+    doc.text('PURGE', ml+70, y+3);
+    checkBox(ml+85, y, d.purgePass==='passed'); doc.setFont('helvetica','normal'); doc.text('Pass', ml+89, y+2.5);
+    checkBox(ml+100, y, d.purgePass==='failed'); doc.text('Fail', ml+104, y+2.5);
+    y += 8;
+
+    // ── WORK UNDERTAKEN ──
+    sectionHeader('Indicate Work Undertaken');
+    checkBox(ml+2, y, d.workStrength); doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.text('Strength Test', ml+6, y+2.5);
+    checkBox(ml+40, y, d.workTightness); doc.text('Tightness Test', ml+44, y+2.5);
+    checkBox(ml+80, y, d.workPurge); doc.text('Purge', ml+84, y+2.5);
+    y += 6;
+
+    // ── DECLARATION ──
+    sectionHeader('Declaration');
+    doc.setFont('helvetica','normal'); doc.setFontSize(6);
+    checkBox(ml+2, y, d.declaration==='safe');
+    doc.text('DECLARATION OF GAS SAFETY - Work completed in accordance with Gas Safety Regulations.', ml+7, y+2.5);
+    y += 5;
+    checkBox(ml+2, y, d.declaration==='unsafe');
+    doc.text('NOTIFICATION OF UNSAFE INSTALLATION - Unsafe installation identified (see Warning/Advice Notice).', ml+7, y+2.5);
+    y += 6;
+
+    // ── COMMENTS ──
+    if (d.comments) {
+        sectionHeader('Engineer Comments');
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+        const clines = doc.splitTextToSize(d.comments, cw - 4);
+        doc.text(clines, ml + 2, y + 2);
+        y += clines.length * 3.5 + 4;
+    }
+
+    // ── SIGNATURES ──
+    sectionHeader('Signatures');
+    fieldBox(ml, y, colW, 9, 'Issued By (Print Name)', d.issuedBy);
+    fieldBox(ml+colW, y, colW, 9, 'Received By (Print Name)', d.receivedBy);
+    fieldBox(ml+colW*2, y, colW, 9, 'Date', formatDate(d.signDate));
+    y += 12;
+
+    doc.setFont('helvetica','normal'); doc.setFontSize(6);
+    doc.setTextColor(120);
+    doc.text('DTA Electrical Mechanical — Non-Domestic Gas Testing and Purging Certificate', pw/2, ph - 8, {align:'center'});
+
+    if (returnBlob) return doc.output('blob');
+    const filename = `Gas_Test_${d.jobName || 'cert'}_${new Date().toISOString().slice(0,10)}.pdf`;
+    doc.save(filename);
+    showToast('PDF downloaded: ' + filename, 'success');
+}
+
+function gasBuildEmailHTML(d) {
+    const tick = '&#10004;'; const cross = '&#10008;'; const dash = '&mdash;';
+    const cb = (v) => v ? `<span style="color:#28a745;font-weight:bold">${tick}</span>` : `<span style="color:#ccc">${cross}</span>`;
+    const yn = (v) => v === 'yes' ? '<span style="color:#28a745;font-weight:bold">Yes</span>' : v === 'no' ? '<span style="color:#dc3545;font-weight:bold">No</span>' : v === 'na' ? 'N/A' : dash;
+    const pf = (v) => v === 'passed' ? '<span style="background:#d4edda;color:#155724;padding:4px 14px;border-radius:4px;font-weight:bold;">PASS</span>' : v === 'failed' ? '<span style="background:#f8d7da;color:#721c24;padding:4px 14px;border-radius:4px;font-weight:bold;">FAIL</span>' : '<span style="color:#999;">—</span>';
+    const v = (val) => val || dash;
+    const sh = (title) => `<div style="background:#004E8C;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">${title}</div>`;
+    const row = (l, val) => `<tr><td style="padding:6px 16px;border-bottom:1px solid #eee;color:#666;width:220px;">${l}</td><td style="padding:6px 16px;border-bottom:1px solid #eee;">${val}</td></tr>`;
+
+    return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:0 auto;color:#1a1a2e;">
+        <div style="background:#004E8C;color:white;padding:16px 24px;border-radius:8px 8px 0 0;">
+            <h1 style="margin:0;font-size:18px;">Non-Domestic Gas Testing and Purging</h1>
+            <p style="margin:4px 0 0;font-size:13px;opacity:0.8;">DTA Electrical Mechanical — Certificate</p>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Company / Installer')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Engineer', v(d.engineer))}${row('Gas Safe Reg No', v(d.gasSafeReg))}${row('ID Card No', v(d.idCard))}
+            </table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Job Address')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Name', v(d.jobName))}${row('Address', v(d.jobAddress))}${row('Post Code', v(d.jobPostCode))}
+            </table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Client / Landlord')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Name', v(d.clientName))}${row('Company', v(d.clientCompany))}${row('Address', v(d.clientAddress))}
+            </table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Strength Test')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Method', v(d.testMethod))}${row('Installation', v(d.strInstall))}${row('Components Removed', yn(d.compRemoved))}
+                ${row('Calculated STP', d.calcSTP ? d.calcSTP + ' mbar' : dash)}${row('Test Medium', v(d.strMedium))}
+                ${row('Stabilisation / Duration', (d.strStab||dash) + ' / ' + (d.std||dash) + ' mins')}
+                ${row('Permitted / Calculated Drop', (d.permDrop ? d.permDrop+'% STP' : dash) + ' / ' + (d.calcDrop ? d.calcDrop+' mbar' : dash))}
+                ${row('Actual Pressure Drop', d.actualStrDrop ? d.actualStrDrop + ' mbar' : dash)}
+            </table>
+            <div style="padding:10px 16px;text-align:right;border-top:1px solid #eee;font-size:14px;"><strong>STRENGTH TEST:</strong> ${pf(d.strPass)}</div>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Tightness Test')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Gas Type', v(d.gasType))}${row('Installation', v(d.tightInstall))}${row('Weather Effect', yn(d.weather))}
+                ${row('Meter', (d.meterType||dash) + ' / ' + (d.meterModel||dash))}${row('Meter Bypass', yn(d.meterBypass))}
+                ${row('Installation Volume', 'Meter: '+(d.ivMeter||dash)+' / Pipe: '+(d.ivPipe||dash)+' / Total: '+(d.ivTotal||dash)+' m&sup3;')}
+                ${row('Test Medium', v(d.tightMedium))}${row('TTP', d.ttp ? d.ttp+' mbar' : dash)}
+                ${row('Gauge Type', v(d.gaugeType))}${row('MPLR/MAPD', v(d.mplr))}
+                ${row('Let-by / Stab / TTD', (d.letBy||dash)+' / '+(d.tightStab||dash)+' / '+(d.ttd||dash)+' mins')}
+                ${row('Ventilated Areas', yn(d.ventCheck))}${row('Barometric Correction', yn(d.barometric))}
+                ${row('Actual Leak Rate', d.actualLeak ? d.actualLeak+' m&sup3;/hr' : dash)}${row('Actual Pressure Drop', d.actualTightDrop ? d.actualTightDrop+' mbar' : dash)}
+                ${row('Vent. Areas Checked', yn(d.ventChecked))}
+            </table>
+            <div style="padding:10px 16px;text-align:right;border-top:1px solid #eee;font-size:14px;"><strong>TIGHTNESS TEST:</strong> ${pf(d.tightPass)}</div>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Purging Procedure')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Risk Assessment', yn(d.riskAssess))}${row('Written Procedure', yn(d.writtenProc))}
+                ${row('Safety Checks', cb(d.noSmoking)+' No Smoking &nbsp; '+cb(d.personsAdvised)+' Persons Advised &nbsp; '+cb(d.valvesLabeled)+' Valves Labeled')}
+                ${row('Equipment', cb(d.nitrogenChecked)+' Nitrogen Checked &nbsp; '+cb(d.elecBands)+' Elec Bands &nbsp; '+cb(d.detectorSafe)+' Detector Safe')}
+                ${row('Two Way Radios', yn(d.radios))}
+                ${row('Purge Volume', 'Meter: '+(d.pvMeter||dash)+' / Pipe: '+(d.pvPipe||dash)+' / Total: '+(d.pvTotal||dash)+' m&sup3;')}
+                ${row('GIA%', v(d.gia))}
+            </table>
+            <div style="padding:10px 16px;text-align:right;border-top:1px solid #eee;font-size:14px;"><strong>PURGE:</strong> ${pf(d.purgePass)}</div>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Work Undertaken')}
+            <div style="padding:10px 16px;font-size:13px;">${cb(d.workStrength)} Strength Test &nbsp;&nbsp; ${cb(d.workTightness)} Tightness Test &nbsp;&nbsp; ${cb(d.workPurge)} Purge</div>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Declaration')}
+            <div style="padding:10px 16px;font-size:13px;">
+                ${d.declaration === 'safe' ? '<span style="background:#d4edda;color:#155724;padding:6px 12px;border-radius:4px;font-weight:bold;">DECLARATION OF GAS SAFETY</span>' :
+                  d.declaration === 'unsafe' ? '<span style="background:#f8d7da;color:#721c24;padding:6px 12px;border-radius:4px;font-weight:bold;">NOTIFICATION OF UNSAFE INSTALLATION</span>' : dash}
+            </div>
+        </div>
+        ${d.comments ? '<div style="border:1px solid #ddd;border-top:none;">'+sh('Engineer Comments')+'<div style="padding:10px 16px;font-size:13px;">'+d.comments+'</div></div>' : ''}
+        <div style="border:1px solid #ddd;border-top:none;border-radius:0 0 8px 8px;">${sh('Signatures')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Issued By', v(d.issuedBy))}${row('Received By', v(d.receivedBy))}${row('Date', formatDate(d.signDate) || dash)}
+            </table>
+        </div>
+        <div style="text-align:center;padding:16px;font-size:11px;color:#999;">DTA Electrical Mechanical &mdash; Generated ${new Date().toLocaleDateString('en-GB')}</div>
+    </div>`;
+}
+
+async function gasGenerateAndEmail() {
+    if (!gasValidateForm()) return;
+    const recipientEmail = val('recipientEmail');
+    const publicKey = val('ejsPublicKey');
+    const serviceId = val('ejsServiceId');
+    const templateId = val('ejsTemplateId');
+    if (!recipientEmail) { showToast('Please enter a recipient email address', 'error'); return; }
+    if (!publicKey || !serviceId || !templateId) { showToast('Please configure EmailJS settings first', 'error'); return; }
+    if (!window.emailjs) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve, reject) => { script.onload = resolve; script.onerror = () => reject(new Error('Failed to load EmailJS')); });
+    }
+    try {
+        emailjs.init(publicKey);
+        const d = gasCollectFormData();
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2,'0');
+        const mm = String(now.getMonth()+1).padStart(2,'0');
+        const yyyy = now.getFullYear();
+        const subject = `Gas Testing & Purging Cert - ${d.jobName || 'Unknown'} - ${dd}-${mm}-${yyyy}`;
+        await emailjs.send(serviceId, templateId, {
+            to_email: recipientEmail,
+            from_name: d.engineer || 'DTA Engineer',
+            subject: subject,
+            message_html: gasBuildEmailHTML(d)
+        });
+        showSuccess(d.jobName, 'Gas Testing & Purging Certificate');
+    } catch (err) {
+        console.error('Email error:', err);
+        showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
+        gasGeneratePDF();
+        showToast('PDF downloaded as fallback.', 'error');
+    }
 }
 
 // Email settings are hardcoded - no persistence needed.
