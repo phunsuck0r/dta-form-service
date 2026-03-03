@@ -469,14 +469,12 @@
         <div class="section-body">
             <div class="field-row">
                 <div class="field-group">
-                    <label>Name of Establishment <span class="required-star">*</span></label>
-                    <input type="text" id="establishment" required>
+                    <label>Client <span class="required-star">*</span></label>
+                    <input type="text" id="establishment">
                 </div>
-            </div>
-            <div class="field-row">
                 <div class="field-group">
-                    <label>Street Address <span class="required-star">*</span> <span class="hint">(include town/city & postcode)</span></label>
-                    <input type="text" id="streetAddress" placeholder="e.g. 14 High Street, Manchester, M1 2AB" required>
+                    <label>Site <span class="required-star">*</span></label>
+                    <input type="text" id="streetAddress">
                 </div>
             </div>
             <div class="field-row">
@@ -569,13 +567,10 @@
         <div class="section-body">
             <p style="font-size:13px;font-weight:600;margin-bottom:8px;color:#444">Work carried out during this site visit:</p>
             <div class="checkbox-grid">
-                <label class="checkbox-item"><input type="checkbox" id="chkDismantled"> Dismantled</label>
-                <label class="checkbox-item"><input type="checkbox" id="chkInspected"> Components Inspected and Cleaned</label>
                 <label class="checkbox-item"><input type="checkbox" id="chkThermoReplaced"> Thermostatic Element Replaced</label>
-                <label class="checkbox-item"><input type="checkbox" id="chkCommissioned"> Commissioned</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkFullReplacement"> Full Replacement</label>
                 <label class="checkbox-item"><input type="checkbox" id="chkServiced"> Serviced</label>
                 <label class="checkbox-item"><input type="checkbox" id="chkNonReturn"> Non-return Valves Checked</label>
-                <label class="checkbox-item"><input type="checkbox" id="chkORings"> O Rings Replaced</label>
                 <label class="checkbox-item"><input type="checkbox" id="chkTempSet"> Temperature Set</label>
             </div>
 
@@ -605,19 +600,6 @@
                         <span>Cold</span>
                         <input type="number" id="tempCold" step="0.1">
                         <span>°C</span>
-                    </div>
-                </div>
-                <div class="reading-row">
-                    <div class="reading-label">Dynamic Pressure of Water Supply <span class="required-star">*</span></div>
-                    <div class="reading-input">
-                        <span>Hot</span>
-                        <input type="number" id="pressHot" step="0.1">
-                        <span>bar</span>
-                    </div>
-                    <div class="reading-input">
-                        <span>Cold</span>
-                        <input type="number" id="pressCold" step="0.1">
-                        <span>bar</span>
                     </div>
                 </div>
                 <div class="reading-row">
@@ -809,8 +791,8 @@ function validateForm() {
     }
 
     // ── Site Details ──
-    reqField('establishment', 'Name of Establishment');
-    reqField('streetAddress', 'Street Address');
+    reqField('establishment', 'Client');
+    reqField('streetAddress', 'Site');
 
     // Email format check (optional but validated if provided)
     const emailEl = document.getElementById('contactEmail');
@@ -844,8 +826,6 @@ function validateForm() {
     }
     reqField('tempHot', 'Temperature Hot');
     reqField('tempCold', 'Temperature Cold');
-    reqField('pressHot', 'Pressure Hot');
-    reqField('pressCold', 'Pressure Cold');
     reqField('tempOutlet', 'TMV Outlet Temperature');
 
     // ── Plumber Sign-off ──
@@ -898,20 +878,15 @@ function collectFormData() {
         compC: radio('compC'),
         compD: radio('compD'),
         complianceReason: val('complianceReason'),
-        chkDismantled: checked('chkDismantled'),
-        chkInspected: checked('chkInspected'),
         chkThermoReplaced: checked('chkThermoReplaced'),
-        chkCommissioned: checked('chkCommissioned'),
+        chkFullReplacement: checked('chkFullReplacement'),
         chkServiced: checked('chkServiced'),
         chkNonReturn: checked('chkNonReturn'),
-        chkORings: checked('chkORings'),
         chkTempSet: checked('chkTempSet'),
         passFail: val('passFail'),
         failSafe: val('failSafe'),
         tempHot: val('tempHot'),
         tempCold: val('tempCold'),
-        pressHot: val('pressHot'),
-        pressCold: val('pressCold'),
         tempOutlet: val('tempOutlet'),
         dateInstall: val('dateInstall'),
         installedBy: val('installedBy'),
@@ -985,9 +960,8 @@ function generatePDF(returnBlob = false) {
 
     // ── SITE DETAILS ──
     sectionHeader('SITE DETAILS');
-    fieldBox(ml, y, cw, 9, 'Name of Establishment', d.establishment);
-    y += 9;
-    fieldBox(ml, y, cw, 9, 'Street Address (include town/city & postcode)', d.streetAddress);
+    fieldBox(ml, y, cw/2, 9, 'Client', d.establishment);
+    fieldBox(ml + cw/2, y, cw/2, 9, 'Site', d.streetAddress);
     y += 9;
     fieldBox(ml, y, cw/2, 9, 'Contact Person', d.contactPerson);
     fieldBox(ml + cw/2, y, cw/2, 9, 'Contact Number', d.contactNumber);
@@ -1073,9 +1047,8 @@ function generatePDF(returnBlob = false) {
     y += 4;
 
     const checks = [
-        [['Dismantled', d.chkDismantled], ['Components Inspected and Cleaned', d.chkInspected], ['Thermostatic Element Replaced', d.chkThermoReplaced]],
-        [['Commissioned', d.chkCommissioned], ['Serviced', d.chkServiced], ['Non-return Valves Checked', d.chkNonReturn]],
-        [['O Rings Replaced', d.chkORings], ['Temperature Set', d.chkTempSet], []]
+        [['Thermostatic Element Replaced', d.chkThermoReplaced], ['Full Replacement', d.chkFullReplacement], ['Serviced', d.chkServiced]],
+        [['Non-return Valves Checked', d.chkNonReturn], ['Temperature Set', d.chkTempSet], []]
     ];
 
     doc.setFont('helvetica', 'normal');
@@ -1133,7 +1106,6 @@ function generatePDF(returnBlob = false) {
     }
 
     readingRow('Temperature of Water Supply', [['Hot', d.tempHot, '\u00B0C'], ['Cold', d.tempCold, '\u00B0C']]);
-    readingRow('Dynamic Pressure of Water Supply', [['Hot', d.pressHot, 'bar'], ['Cold', d.pressCold, 'bar']]);
     readingRow('Temperature of Water at TMV Outlet', [['', d.tempOutlet, '\u00B0C']]);
 
     y += 4;
@@ -1212,11 +1184,11 @@ function buildEmailHTML(d) {
             <div style="background:#004E8C;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">Site Details</div>
             <table style="width:100%;border-collapse:collapse;font-size:13px;" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;width:180px;">Establishment</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;width:180px;">Client</td>
                     <td style="padding:8px 16px;border-bottom:1px solid #eee;font-weight:600;">${v(d.establishment)}</td>
                 </tr>
                 <tr>
-                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Address</td>
+                    <td style="padding:8px 16px;border-bottom:1px solid #eee;color:#666;">Site</td>
                     <td style="padding:8px 16px;border-bottom:1px solid #eee;">${v(d.streetAddress)}</td>
                 </tr>
                 <tr>
@@ -1291,17 +1263,12 @@ function buildEmailHTML(d) {
                 <p style="font-size:12px;font-weight:bold;margin:0 0 8px;color:#444;">Work Carried Out:</p>
                 <table style="font-size:12px;border-collapse:collapse;" cellpadding="0" cellspacing="0">
                     <tr>
-                        <td style="padding:3px 16px 3px 0;">${cb(d.chkDismantled)} Dismantled</td>
-                        <td style="padding:3px 16px 3px 0;">${cb(d.chkInspected)} Inspected &amp; Cleaned</td>
-                        <td style="padding:3px 0;">${cb(d.chkThermoReplaced)} Thermo Element Replaced</td>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkThermoReplaced)} Thermo Element Replaced</td>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkFullReplacement)} Full Replacement</td>
+                        <td style="padding:3px 0;">${cb(d.chkServiced)} Serviced</td>
                     </tr>
                     <tr>
-                        <td style="padding:3px 16px 3px 0;">${cb(d.chkCommissioned)} Commissioned</td>
-                        <td style="padding:3px 16px 3px 0;">${cb(d.chkServiced)} Serviced</td>
-                        <td style="padding:3px 0;">${cb(d.chkNonReturn)} Non-return Valves Checked</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:3px 16px 3px 0;">${cb(d.chkORings)} O Rings Replaced</td>
+                        <td style="padding:3px 16px 3px 0;">${cb(d.chkNonReturn)} Non-return Valves Checked</td>
                         <td style="padding:3px 0;">${cb(d.chkTempSet)} Temperature Set</td>
                         <td></td>
                     </tr>
@@ -1339,10 +1306,6 @@ function buildEmailHTML(d) {
                 <tr style="background:#f8f9fa;">
                     <td style="padding:8px 16px;color:#666;">Temperature of Water Supply</td>
                     <td style="padding:8px 16px;text-align:right;">Hot: <strong>${d.tempHot || dash}</strong> &deg;C &nbsp; Cold: <strong>${d.tempCold || dash}</strong> &deg;C</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px 16px;color:#666;">Dynamic Pressure</td>
-                    <td style="padding:8px 16px;text-align:right;">Hot: <strong>${d.pressHot || dash}</strong> bar &nbsp; Cold: <strong>${d.pressCold || dash}</strong> bar</td>
                 </tr>
                 <tr style="background:#f8f9fa;">
                     <td style="padding:8px 16px;color:#666;font-weight:bold;">TMV Outlet Temperature</td>
