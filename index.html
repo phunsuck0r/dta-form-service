@@ -380,6 +380,42 @@
 </head>
 <body>
 
+<!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+<div id="loginOverlay" style="
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:linear-gradient(135deg,#004E8C,#0072CE);
+    z-index:9999;display:flex;align-items:center;justify-content:center;
+">
+    <div style="background:white;border-radius:16px;padding:40px;width:360px;box-shadow:0 8px 40px rgba(0,0,0,0.25);text-align:center;">
+        <h1 style="font-size:22px;color:#004E8C;margin-bottom:4px;">DTA Electrical Mechanical</h1>
+        <p style="font-size:13px;color:#888;margin-bottom:28px;">Form Filling Service</p>
+        <div style="text-align:left;margin-bottom:14px;">
+            <label style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.3px;">Username</label>
+            <input type="text" id="loginUser" autocomplete="off" style="
+                width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;
+                font-size:14px;margin-top:4px;background:#fafafa;
+            " placeholder="Enter username">
+        </div>
+        <div style="text-align:left;margin-bottom:24px;">
+            <label style="font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:0.3px;">Password</label>
+            <input type="password" id="loginPass" autocomplete="off" style="
+                width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;
+                font-size:14px;margin-top:4px;background:#fafafa;
+            " placeholder="Enter password">
+        </div>
+        <div id="loginError" style="color:#dc3545;font-size:13px;margin-bottom:12px;display:none;">
+            Invalid username or password
+        </div>
+        <button onclick="attemptLogin()" style="
+            width:100%;padding:12px;background:linear-gradient(135deg,#004E8C,#0072CE);
+            color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;
+            cursor:pointer;transition:opacity 0.2s;
+        " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+            Log In
+        </button>
+    </div>
+</div>
+
 <!-- ═══════════════════ NAVBAR ═══════════════════ -->
 <nav class="navbar">
     <div>
@@ -645,6 +681,35 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ══════════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════════
+function attemptLogin() {
+    const user = document.getElementById('loginUser').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    if (user === 'DTA' && pass === 'DTA1234') {
+        document.getElementById('loginOverlay').style.display = 'none';
+        sessionStorage.setItem('dtaLoggedIn', 'true');
+    } else {
+        const errEl = document.getElementById('loginError');
+        errEl.style.display = 'block';
+        document.getElementById('loginPass').value = '';
+        document.getElementById('loginPass').focus();
+    }
+}
+
+// Allow Enter key to submit login
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && document.getElementById('loginOverlay').style.display !== 'none') {
+        attemptLogin();
+    }
+});
+
+// Check if already logged in this session
+if (sessionStorage.getItem('dtaLoggedIn') === 'true') {
+    document.getElementById('loginOverlay').style.display = 'none';
+}
+
 // ══════════════════════════════════════════════════
 // UTILITY
 // ══════════════════════════════════════════════════
