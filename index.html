@@ -47,37 +47,52 @@
         }
 
         /* ── Form Selector ── */
-        .form-selector {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        /* ── Landing Page ── */
+        .landing-page {
+            text-align: center;
+            padding: 40px 0 20px;
         }
-        .form-selector h2 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #444;
+        .landing-page h2 {
+            font-size: 22px;
+            color: #004E8C;
+            margin-bottom: 6px;
+        }
+        .landing-page .landing-sub {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 28px;
         }
         .form-cards {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
         }
         .form-card {
-            flex: 1;
-            min-width: 200px;
+            background: white;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 24px 20px;
             cursor: pointer;
             transition: all 0.2s;
-            background: #fafafa;
+            text-align: left;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
-        .form-card:hover { border-color: #0072CE; background: #EAF2FB; }
-        .form-card.active { border-color: #0072CE; background: #EAF2FB; box-shadow: 0 0 0 3px rgba(0,114,206,0.15); }
-        .form-card h3 { font-size: 14px; margin-bottom: 4px; }
-        .form-card p { font-size: 12px; color: #888; }
+        .form-card:hover { border-color: #0072CE; background: #EAF2FB; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,78,140,0.12); }
+        .form-card .card-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: #EAF2FB; color: #0072CE;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; margin-bottom: 12px;
+        }
+        .form-card h3 { font-size: 15px; margin-bottom: 6px; color: #1a1a2e; }
+        .form-card p { font-size: 12px; color: #888; line-height: 1.4; }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: none; border: none; color: #0072CE;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            padding: 8px 0; margin-bottom: 12px;
+        }
+        .back-btn:hover { color: #004E8C; }
 
         /* ── Form Container ── */
         .form-container {
@@ -427,28 +442,37 @@
 
 <div class="main-container">
 
-    <!-- Setup banner hidden - email is pre-configured -->
-
-    <!-- ═══════════════════ FORM SELECTOR ═══════════════════ -->
-    <div class="form-selector">
-        <h2>Select Form Template</h2>
-        <div class="form-cards">
-            <div class="form-card active" onclick="selectForm('tmv', this)">
-                <h3>TMV Commissioning Report</h3>
-                <p>Thermostatic Mixing Valve Commissioning / Maintenance Report</p>
-            </div>
-            <div class="form-card" onclick="selectForm('gas', this)">
-                <h3>Gas Testing & Purging</h3>
-                <p>Non-Domestic Gas Testing and Purging Certificate</p>
-            </div>
-        </div>
-    </div>
-
     <!-- Email config - hardcoded, hidden from engineers -->
     <input type="hidden" id="recipientEmail" value="admin@dtaelectricalmechanical.co.uk,marion.ashton@dtaelectricalmechanical.co.uk">
     <input type="hidden" id="ejsPublicKey" value="zyfJx9BujPpf4smFJ">
     <input type="hidden" id="ejsServiceId" value="service_u1gyn9g">
     <input type="hidden" id="ejsTemplateId" value="template_v4b2bkf">
+
+    <!-- ═══════════════════ LANDING PAGE ═══════════════════ -->
+    <div id="landingPage" class="landing-page">
+        <h2>Welcome to the Engineer Portal</h2>
+        <p class="landing-sub">Select a form to get started</p>
+        <div class="form-cards">
+            <div class="form-card" onclick="openForm('tmv')">
+                <div class="card-icon">&#9670;</div>
+                <h3>TMV Commissioning Report</h3>
+                <p>Thermostatic Mixing Valve Commissioning / Maintenance Report</p>
+            </div>
+            <div class="form-card" onclick="openForm('gas')">
+                <div class="card-icon">&#9672;</div>
+                <h3>Gas Testing & Purging</h3>
+                <p>Non-Domestic Gas Testing and Purging Certificate</p>
+            </div>
+            <div class="form-card" onclick="openForm('unvented')">
+                <div class="card-icon">&#9711;</div>
+                <h3>Unvented Water Heater</h3>
+                <p>Unvented Water Heater Service / Commissioning Report</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back button (hidden when on landing) -->
+    <button id="backBtn" class="back-btn" onclick="backToLanding()" style="display:none;">&#8592; Back to Forms</button>
 
     <!-- Validation Message -->
     <div class="validation-msg" id="validationMsg">
@@ -457,7 +481,7 @@
     </div>
 
     <!-- ═══════════════════ TMV FORM ═══════════════════ -->
-    <form id="tmvForm" class="form-container" autocomplete="on" onsubmit="return false;">
+    <form id="tmvForm" class="form-container" autocomplete="on" onsubmit="return false;" style="display:none;">
 
         <!-- SITE DETAILS -->
         <div class="section-header">Site Details</div>
@@ -949,6 +973,114 @@
         </div>
     </form>
 
+    <!-- ═══════════════════ UNVENTED WATER HEATER FORM ═══════════════════ -->
+    <form id="unventedForm" class="form-container" autocomplete="on" onsubmit="return false;" style="display:none;">
+
+        <!-- CLIENT & SITE -->
+        <div class="section-header">Client & Site Details</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Client <span class="required-star">*</span></label><input type="text" id="uvClient" name="uvClient"></div>
+                <div class="field-group"><label>Site <span class="required-star">*</span></label><input type="text" id="uvSite" name="uvSite"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Postcode</label><input type="text" id="uvPostcode" name="uvPostcode"></div>
+                <div class="field-group"><label>Site Contact</label><input type="text" id="uvSiteContact" name="uvSiteContact"></div>
+                <div class="field-group"><label>Telephone No</label><input type="tel" id="uvTelephone" name="uvTelephone"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Reg Number</label><input type="text" id="uvRegNo" name="uvRegNo"></div>
+                <div class="field-group">
+                    <label>Recall</label>
+                    <div class="compliance-options" style="padding-top:6px;">
+                        <label class="radio-option"><input type="radio" name="uvRecall" value="service"> Service</label>
+                        <label class="radio-option"><input type="radio" name="uvRecall" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="uvRecall" value="no"> No</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HEATER DETAILS -->
+        <div class="section-header">Heater Details</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Heater Type</label><input type="text" id="uvHeaterType" name="uvHeaterType"></div>
+                <div class="field-group"><label>Manufacturer <span class="required-star">*</span></label><input type="text" id="uvManufacturer" name="uvManufacturer"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group">
+                    <label>Multipoint</label>
+                    <div class="compliance-options" style="padding-top:6px;">
+                        <label class="radio-option"><input type="radio" name="uvMultipoint" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="uvMultipoint" value="no"> No</label>
+                    </div>
+                </div>
+                <div class="field-group"><label>Model</label><input type="text" id="uvModel" name="uvModel"></div>
+                <div class="field-group"><label>Size</label><input type="text" id="uvSize" name="uvSize"></div>
+            </div>
+        </div>
+
+        <!-- CORRECT OPERATION -->
+        <div class="section-header">Correct Operation</div>
+        <div class="section-body">
+            <div class="compliance-table">
+                <div class="compliance-row" style="font-weight:bold;border-bottom:2px solid #ddd;">
+                    <div class="compliance-label">Item</div>
+                    <div class="compliance-options"><span style="font-size:12px;">Yes / No / N/A</span></div>
+                </div>
+                <div class="compliance-row"><div class="compliance-label">Servicing Valve</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvServicingValve" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvServicingValve" value="no"> No</label><label class="radio-option"><input type="radio" name="uvServicingValve" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Line Strainer</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvLineStrainer" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvLineStrainer" value="no"> No</label><label class="radio-option"><input type="radio" name="uvLineStrainer" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Pressure Reducing Valve</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvPRV" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvPRV" value="no"> No</label><label class="radio-option"><input type="radio" name="uvPRV" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Tee for Balanced Cold Water Draw Offs</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvTee" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvTee" value="no"> No</label><label class="radio-option"><input type="radio" name="uvTee" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Single Check Valve</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvCheckValve" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvCheckValve" value="no"> No</label><label class="radio-option"><input type="radio" name="uvCheckValve" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Expansion Release Valve</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvExpRelease" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvExpRelease" value="no"> No</label><label class="radio-option"><input type="radio" name="uvExpRelease" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Provision For Expansion</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvExpansion" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvExpansion" value="no"> No</label><label class="radio-option"><input type="radio" name="uvExpansion" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Temperature and Pressure Relief Valve</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvTPRV" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvTPRV" value="no"> No</label><label class="radio-option"><input type="radio" name="uvTPRV" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Direct Fired Thermostat and Energy Cut-Out</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvDirectFired" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvDirectFired" value="no"> No</label><label class="radio-option"><input type="radio" name="uvDirectFired" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Indirectly Fired Thermostat and Energy Cut-Out & Zone Valve</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvIndirectFired" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvIndirectFired" value="no"> No</label><label class="radio-option"><input type="radio" name="uvIndirectFired" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">'Component' Installers Details Displayed on Vessel</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvCompDetails" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvCompDetails" value="no"> No</label><label class="radio-option"><input type="radio" name="uvCompDetails" value="na"> N/A</label></div></div>
+            </div>
+        </div>
+
+        <!-- DISCHARGE PIPEWORK -->
+        <div class="section-header">Discharge Pipework</div>
+        <div class="section-body">
+            <div class="compliance-table">
+                <div class="compliance-row"><div class="compliance-label">Metal?</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvMetal" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvMetal" value="no"> No</label><label class="radio-option"><input type="radio" name="uvMetal" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Correctly Sized Upstream of Tundish?</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvUpstream" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvUpstream" value="no"> No</label><label class="radio-option"><input type="radio" name="uvUpstream" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Correctly Sized Downstream of Tundish?</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvDownstream" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvDownstream" value="no"> No</label><label class="radio-option"><input type="radio" name="uvDownstream" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Tundish Within 500mm of Temperature Relief Valve?</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvTundish500" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvTundish500" value="no"> No</label><label class="radio-option"><input type="radio" name="uvTundish500" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">No Bend Within 300mm of Tundish?</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvNoBend" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvNoBend" value="no"> No</label><label class="radio-option"><input type="radio" name="uvNoBend" value="na"> N/A</label></div></div>
+                <div class="compliance-row"><div class="compliance-label">Correctly Terminated?</div><div class="compliance-options"><label class="radio-option"><input type="radio" name="uvTerminated" value="yes"> Yes</label><label class="radio-option"><input type="radio" name="uvTerminated" value="no"> No</label><label class="radio-option"><input type="radio" name="uvTerminated" value="na"> N/A</label></div></div>
+            </div>
+        </div>
+
+        <!-- COMMENTS -->
+        <div class="section-header">Comments</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><textarea id="uvComments" name="uvComments" style="min-height:100px"></textarea></div>
+            </div>
+        </div>
+
+        <!-- ENGINEER SIGNATURE -->
+        <div class="section-header">Engineer Signature</div>
+        <div class="section-body">
+            <div class="field-row">
+                <div class="field-group"><label>Engineer <span class="required-star">*</span></label><input type="text" id="uvEngineer" name="uvEngineer"></div>
+                <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="uvSignDate" name="uvSignDate"></div>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+            <button type="button" class="btn btn-secondary" onclick="uvClearForm()">Clear Form</button>
+            <button type="button" class="btn btn-primary" onclick="uvGeneratePDF()">Download PDF</button>
+            <button type="button" class="btn btn-success" onclick="uvGenerateAndEmail()">Generate PDF & Email</button>
+        </div>
+    </form>
+
 </div>
 
 <!-- ═══════════════════ SUCCESS PAGE ═══════════════════ -->
@@ -1030,15 +1162,27 @@ function togglePassFail(btn, type, hiddenId) {
     btn.parentElement.classList.remove('invalid');
 }
 
-let activeFormType = 'tmv';
-function selectForm(formType, card) {
+let activeFormType = '';
+function openForm(formType) {
     activeFormType = formType;
-    document.querySelectorAll('.form-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
+    document.getElementById('landingPage').style.display = 'none';
+    document.getElementById('backBtn').style.display = '';
     document.getElementById('tmvForm').style.display = formType === 'tmv' ? '' : 'none';
     document.getElementById('gasForm').style.display = formType === 'gas' ? '' : 'none';
+    document.getElementById('unventedForm').style.display = formType === 'unvented' ? '' : 'none';
     document.getElementById('validationMsg').style.display = 'none';
+    if (formType === 'tmv') setDefaultSignDate();
     if (formType === 'gas') gasSetDefaultDate();
+    if (formType === 'unvented') uvSetDefaultDate();
+}
+function backToLanding() {
+    activeFormType = '';
+    document.getElementById('landingPage').style.display = '';
+    document.getElementById('backBtn').style.display = 'none';
+    document.getElementById('tmvForm').style.display = 'none';
+    document.getElementById('gasForm').style.display = 'none';
+    document.getElementById('unventedForm').style.display = 'none';
+    document.getElementById('validationMsg').style.display = 'none';
 }
 
 // Clear invalid styling on user input
@@ -1746,7 +1890,10 @@ function showSuccess(client, formLabel) {
 
 function dismissSuccess() {
     document.getElementById('successOverlay').style.display = 'none';
-    if (activeFormType === 'gas') gasClearForm(); else clearForm();
+    if (activeFormType === 'gas') gasClearForm();
+    else if (activeFormType === 'unvented') uvClearForm();
+    else clearForm();
+    backToLanding();
 }
 
 // ══════════════════════════════════════════════════
@@ -2207,6 +2354,283 @@ async function gasGenerateAndEmail() {
         console.error('Email error:', err);
         showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
         gasGeneratePDF();
+        showToast('PDF downloaded as fallback.', 'error');
+    }
+}
+
+// ══════════════════════════════════════════════════
+// UNVENTED WATER HEATER FORM
+// ══════════════════════════════════════════════════
+function uvSetDefaultDate() {
+    const el = document.getElementById('uvSignDate');
+    if (el && !el.value) el.value = new Date().toISOString().slice(0, 10);
+}
+
+function uvClearForm() {
+    document.getElementById('unventedForm').reset();
+    document.querySelectorAll('#unventedForm .invalid').forEach(el => el.classList.remove('invalid'));
+    document.getElementById('validationMsg').style.display = 'none';
+    uvSetDefaultDate();
+    showToast('Form cleared');
+}
+
+const uvOperationItems = [
+    ['uvServicingValve', 'Servicing Valve'], ['uvLineStrainer', 'Line Strainer'],
+    ['uvPRV', 'Pressure Reducing Valve'], ['uvTee', 'Tee for Balanced Cold Water Draw Offs'],
+    ['uvCheckValve', 'Single Check Valve'], ['uvExpRelease', 'Expansion Release Valve'],
+    ['uvExpansion', 'Provision For Expansion'], ['uvTPRV', 'Temperature and Pressure Relief Valve'],
+    ['uvDirectFired', 'Direct Fired Thermostat & Energy Cut-Out'],
+    ['uvIndirectFired', 'Indirectly Fired Thermostat & Energy Cut-Out & Zone Valve'],
+    ['uvCompDetails', "Component Installers Details on Vessel"]
+];
+const uvDischargeItems = [
+    ['uvMetal', 'Metal?'], ['uvUpstream', 'Correctly Sized Upstream of Tundish?'],
+    ['uvDownstream', 'Correctly Sized Downstream of Tundish?'],
+    ['uvTundish500', 'Tundish Within 500mm of Temp Relief Valve?'],
+    ['uvNoBend', 'No Bend Within 300mm of Tundish?'], ['uvTerminated', 'Correctly Terminated?']
+];
+
+function uvValidateForm() {
+    const errors = [];
+    document.querySelectorAll('#unventedForm .invalid').forEach(el => el.classList.remove('invalid'));
+    function reqField(id, label) {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) { if (el) el.classList.add('invalid'); errors.push(label); }
+    }
+    reqField('uvClient', 'Client');
+    reqField('uvSite', 'Site');
+    reqField('uvManufacturer', 'Manufacturer');
+    reqField('uvEngineer', 'Engineer');
+    reqField('uvSignDate', 'Date');
+
+    const msgEl = document.getElementById('validationMsg');
+    const listEl = document.getElementById('validationList');
+    if (errors.length > 0) {
+        listEl.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+        msgEl.style.display = 'block';
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    }
+    msgEl.style.display = 'none';
+    return true;
+}
+
+function uvCollectFormData() {
+    const d = {
+        client: val('uvClient'), site: val('uvSite'), postcode: val('uvPostcode'),
+        siteContact: val('uvSiteContact'), telephone: val('uvTelephone'),
+        regNo: val('uvRegNo'), recall: radio('uvRecall'),
+        heaterType: val('uvHeaterType'), manufacturer: val('uvManufacturer'),
+        multipoint: radio('uvMultipoint'), model: val('uvModel'), size: val('uvSize'),
+        comments: val('uvComments'), engineer: val('uvEngineer'), signDate: val('uvSignDate')
+    };
+    uvOperationItems.forEach(([name]) => d[name] = radio(name));
+    uvDischargeItems.forEach(([name]) => d[name] = radio(name));
+    return d;
+}
+
+function uvGeneratePDF(returnBlob = false) {
+    if (!returnBlob && !uvValidateForm()) return;
+    const d = uvCollectFormData();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pw = 210, ml = 12, mr = pw - 12, cw = mr - ml;
+    let y = 12;
+    const darkBg = [0, 78, 140];
+    const ynText = (v) => v === 'yes' ? 'Yes' : v === 'no' ? 'No' : v === 'na' ? 'N/A' : '';
+
+    // Title
+    doc.setFont('helvetica','bold'); doc.setFontSize(14);
+    doc.text('UNVENTED WATER HEATER', pw/2, y, {align:'center'});
+    y += 6;
+    doc.text('SERVICE / COMMISSIONING REPORT', pw/2, y, {align:'center'});
+    y += 4;
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text('DTA Electrical Mechanical', pw/2, y, {align:'center'});
+    y += 6;
+
+    function sectionHeader(text) {
+        doc.setFillColor(...darkBg); doc.rect(ml, y, cw, 7, 'F');
+        doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+        doc.text(text, ml + 3, y + 5); doc.setTextColor(0,0,0); y += 9;
+    }
+    function fieldBox(x, yp, w, h, label, value) {
+        doc.setDrawColor(200); doc.rect(x, yp, w, h);
+        doc.setFont('helvetica','normal'); doc.setFontSize(6); doc.setTextColor(120);
+        doc.text(label, x + 1.5, yp + 3.5); doc.setTextColor(0);
+        doc.setFontSize(9); doc.setFont('helvetica','normal');
+        if (value) doc.text(String(value), x + 2, yp + h - 2);
+    }
+
+    // Client & Site
+    sectionHeader('CLIENT & SITE DETAILS');
+    const hw = cw / 2;
+    fieldBox(ml, y, hw, 9, 'Client', d.client);
+    fieldBox(ml+hw, y, hw, 9, 'Site', d.site);
+    y += 9;
+    const tw = cw / 3;
+    fieldBox(ml, y, tw, 9, 'Postcode', d.postcode);
+    fieldBox(ml+tw, y, tw, 9, 'Site Contact', d.siteContact);
+    fieldBox(ml+tw*2, y, tw, 9, 'Telephone', d.telephone);
+    y += 9;
+    fieldBox(ml, y, tw, 9, 'Reg Number', d.regNo);
+    fieldBox(ml+tw, y, tw, 9, 'Recall', d.recall || '');
+    y += 11;
+
+    // Heater Details
+    sectionHeader('HEATER DETAILS');
+    fieldBox(ml, y, hw, 9, 'Heater Type', d.heaterType);
+    fieldBox(ml+hw, y, hw, 9, 'Manufacturer', d.manufacturer);
+    y += 9;
+    fieldBox(ml, y, tw, 9, 'Multipoint', d.multipoint === 'yes' ? 'Yes' : d.multipoint === 'no' ? 'No' : '');
+    fieldBox(ml+tw, y, tw, 9, 'Model', d.model);
+    fieldBox(ml+tw*2, y, tw, 9, 'Size', d.size);
+    y += 11;
+
+    // Correct Operation table
+    sectionHeader('CORRECT OPERATION');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+    doc.text('Item', ml + 3, y + 2.5);
+    doc.text('Result', mr - 20, y + 2.5);
+    doc.setDrawColor(180); doc.line(ml, y + 4, mr, y + 4);
+    y += 6;
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    uvOperationItems.forEach(([name, label]) => {
+        doc.text(label, ml + 3, y + 2.5);
+        const val = ynText(d[name]);
+        if (val === 'No') { doc.setTextColor(220, 53, 69); }
+        doc.text(val, mr - 18, y + 2.5);
+        doc.setTextColor(0, 0, 0);
+        doc.setDrawColor(230); doc.line(ml, y + 4, mr, y + 4);
+        y += 5;
+    });
+    y += 3;
+
+    // Discharge Pipework table
+    sectionHeader('DISCHARGE PIPEWORK');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5);
+    doc.text('Item', ml + 3, y + 2.5);
+    doc.text('Result', mr - 20, y + 2.5);
+    doc.setDrawColor(180); doc.line(ml, y + 4, mr, y + 4);
+    y += 6;
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    uvDischargeItems.forEach(([name, label]) => {
+        doc.text(label, ml + 3, y + 2.5);
+        const val = ynText(d[name]);
+        if (val === 'No') { doc.setTextColor(220, 53, 69); }
+        doc.text(val, mr - 18, y + 2.5);
+        doc.setTextColor(0, 0, 0);
+        doc.setDrawColor(230); doc.line(ml, y + 4, mr, y + 4);
+        y += 5;
+    });
+    y += 3;
+
+    // Comments
+    if (d.comments) {
+        sectionHeader('COMMENTS');
+        doc.setFont('helvetica','normal'); doc.setFontSize(8);
+        const clines = doc.splitTextToSize(d.comments, cw - 4);
+        doc.text(clines, ml + 2, y + 2);
+        y += clines.length * 3.5 + 6;
+    }
+
+    // Engineer
+    sectionHeader('ENGINEER SIGNATURE');
+    fieldBox(ml, y, hw, 9, 'Engineer', d.engineer);
+    fieldBox(ml+hw, y, hw, 9, 'Date', formatDate(d.signDate));
+
+    if (returnBlob) return doc.output('blob');
+    const filename = `Unvented_Report_${d.client || 'form'}_${new Date().toISOString().slice(0,10)}.pdf`;
+    doc.save(filename);
+    showToast('PDF downloaded: ' + filename, 'success');
+}
+
+function uvBuildEmailHTML(d) {
+    const dash = '&mdash;';
+    const yn3 = (v) => v === 'yes' ? '<span style="color:#28a745;font-weight:bold">Yes</span>' : v === 'no' ? '<span style="color:#dc3545;font-weight:bold">No</span>' : v === 'na' ? 'N/A' : dash;
+    const v = (val) => val || dash;
+    const sh = (title) => `<div style="background:#004E8C;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">${title}</div>`;
+    const row = (l, val) => `<tr><td style="padding:6px 16px;border-bottom:1px solid #eee;color:#666;width:280px;">${l}</td><td style="padding:6px 16px;border-bottom:1px solid #eee;">${val}</td></tr>`;
+
+    let opRows = ''; uvOperationItems.forEach(([name, label]) => opRows += row(label, yn3(d[name])));
+    let dpRows = ''; uvDischargeItems.forEach(([name, label]) => dpRows += row(label, yn3(d[name])));
+
+    return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:0 auto;color:#1a1a2e;">
+        <div style="background:#004E8C;color:white;padding:20px 24px;border-radius:8px 8px 0 0;">
+            <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0"><tr>
+                <td style="vertical-align:middle;width:80px;"><img src="https://dtaelectricalmechanical.co.uk/logo.png" alt="DTA" style="width:70px;height:auto;border-radius:6px;background:white;padding:4px;"></td>
+                <td style="vertical-align:middle;padding-left:16px;">
+                    <h1 style="margin:0;font-size:18px;color:white;">DTA Electrical Mechanical</h1>
+                    <p style="margin:4px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">Store Room, The Old Mill, Kinoulton Rd, Cropwell Bishop, Nottingham NG12 3BE</p>
+                    <p style="margin:2px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">admin@dtaelectricalmechanical.co.uk</p>
+                </td>
+            </tr></table>
+        </div>
+        <div style="background:#0072CE;color:white;padding:10px 24px;">
+            <h2 style="margin:0;font-size:15px;">Unvented Water Heater</h2>
+            <p style="margin:2px 0 0;font-size:12px;opacity:0.85;">Service / Commissioning Report</p>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Client & Site')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Client', '<strong>'+v(d.client)+'</strong>')}${row('Site', v(d.site))}${row('Postcode', v(d.postcode))}
+                ${row('Site Contact', v(d.siteContact))}${row('Reg Number', v(d.regNo))}
+            </table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Heater Details')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Manufacturer', v(d.manufacturer))}${row('Model / Size', v(d.model) + (d.size ? ' / '+d.size : ''))}
+                ${row('Heater Type', v(d.heaterType))}${row('Multipoint', yn3(d.multipoint))}
+            </table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Correct Operation')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">${opRows}</table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Discharge Pipework')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">${dpRows}</table>
+        </div>
+        ${d.comments ? '<div style="border:1px solid #ddd;border-top:none;">'+sh('Comments')+'<div style="padding:12px 16px;font-size:13px;">'+d.comments+'</div></div>' : ''}
+        <div style="border:1px solid #ddd;border-top:none;border-radius:0 0 8px 8px;">${sh('Engineer')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Engineer', '<strong>'+v(d.engineer)+'</strong>')}${row('Date', formatDate(d.signDate) || dash)}
+            </table>
+        </div>
+        <div style="text-align:center;padding:16px;font-size:11px;color:#999;">DTA Electrical Mechanical &mdash; Generated ${new Date().toLocaleDateString('en-GB')}</div>
+    </div>`;
+}
+
+async function uvGenerateAndEmail() {
+    if (!uvValidateForm()) return;
+    const recipientEmail = val('recipientEmail');
+    const publicKey = val('ejsPublicKey');
+    const serviceId = val('ejsServiceId');
+    const templateId = val('ejsTemplateId');
+    if (!recipientEmail) { showToast('Please enter a recipient email address', 'error'); return; }
+    if (!publicKey || !serviceId || !templateId) { showToast('Please configure EmailJS settings first', 'error'); return; }
+    if (!window.emailjs) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve, reject) => { script.onload = resolve; script.onerror = () => reject(new Error('Failed to load EmailJS')); });
+    }
+    try {
+        emailjs.init(publicKey);
+        const d = uvCollectFormData();
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2,'0');
+        const mm = String(now.getMonth()+1).padStart(2,'0');
+        const yyyy = now.getFullYear();
+        const subject = `Unvented Water Heater Report - ${d.client || 'Unknown'} - ${dd}-${mm}-${yyyy}`;
+        await emailjs.send(serviceId, templateId, {
+            to_email: recipientEmail,
+            from_name: d.engineer || 'DTA Engineer',
+            subject: subject,
+            message_html: uvBuildEmailHTML(d)
+        });
+        showSuccess(d.client, 'Unvented Water Heater Report');
+    } catch (err) {
+        console.error('Email error:', err);
+        showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
+        uvGeneratePDF();
         showToast('PDF downloaded as fallback.', 'error');
     }
 }
