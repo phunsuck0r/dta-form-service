@@ -991,13 +991,13 @@
             <div class="field-row">
                 <div class="field-group"><label>Reg Number</label><input type="text" id="uvRegNo" name="uvRegNo"></div>
                 <div class="field-group">
-                    <label>Recall</label>
+                    <label>Service</label>
                     <div class="compliance-options" style="padding-top:6px;">
-                        <label class="radio-option"><input type="radio" name="uvRecall" value="service"> Service</label>
-                        <label class="radio-option"><input type="radio" name="uvRecall" value="yes"> Yes</label>
-                        <label class="radio-option"><input type="radio" name="uvRecall" value="no"> No</label>
+                        <label class="radio-option"><input type="radio" name="uvService" value="yes"> Yes</label>
+                        <label class="radio-option"><input type="radio" name="uvService" value="no"> No</label>
                     </div>
                 </div>
+                <div class="field-group"><label>Recall</label><input type="text" id="uvRecall" name="uvRecall"></div>
             </div>
         </div>
 
@@ -2419,7 +2419,7 @@ function uvCollectFormData() {
     const d = {
         client: val('uvClient'), site: val('uvSite'), postcode: val('uvPostcode'),
         siteContact: val('uvSiteContact'), telephone: val('uvTelephone'),
-        regNo: val('uvRegNo'), recall: radio('uvRecall'),
+        regNo: val('uvRegNo'), service: radio('uvService'), recall: val('uvRecall'),
         heaterType: val('uvHeaterType'), manufacturer: val('uvManufacturer'),
         multipoint: radio('uvMultipoint'), model: val('uvModel'), size: val('uvSize'),
         comments: val('uvComments'), engineer: val('uvEngineer'), signDate: val('uvSignDate')
@@ -2474,7 +2474,8 @@ function uvGeneratePDF(returnBlob = false) {
     fieldBox(ml+tw*2, y, tw, 9, 'Telephone', d.telephone);
     y += 9;
     fieldBox(ml, y, tw, 9, 'Reg Number', d.regNo);
-    fieldBox(ml+tw, y, tw, 9, 'Recall', d.recall || '');
+    fieldBox(ml+tw, y, tw, 9, 'Service', d.service === 'yes' ? 'Yes' : d.service === 'no' ? 'No' : '');
+    fieldBox(ml+tw*2, y, tw, 9, 'Recall', d.recall || '');
     y += 11;
 
     // Heater Details
@@ -2574,6 +2575,7 @@ function uvBuildEmailHTML(d) {
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
                 ${row('Client', '<strong>'+v(d.client)+'</strong>')}${row('Site', v(d.site))}${row('Postcode', v(d.postcode))}
                 ${row('Site Contact', v(d.siteContact))}${row('Reg Number', v(d.regNo))}
+                ${row('Service', d.service === 'yes' ? 'Yes' : d.service === 'no' ? 'No' : '')}${row('Recall', v(d.recall))}
             </table>
         </div>
         <div style="border:1px solid #ddd;border-top:none;">${sh('Heater Details')}
