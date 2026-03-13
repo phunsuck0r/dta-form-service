@@ -468,6 +468,11 @@
                 <h3>Unvented Water Heater</h3>
                 <p>Unvented Water Heater Service / Commissioning Report</p>
             </div>
+            <div class="form-card" onclick="openForm('extractfan')">
+                <div class="card-icon">&#9881;</div>
+                <h3>Extract Fans</h3>
+                <p>Routine Monitoring Data Collection Sheet</p>
+            </div>
         </div>
     </div>
 
@@ -1081,6 +1086,58 @@
         </div>
     </form>
 
+    <!-- ═══════════════════ EXTRACT FANS FORM ═══════════════════ -->
+    <form id="extractFanForm" class="form-container" autocomplete="on" onsubmit="return false;" style="display:none;">
+        <h2 class="section-title" style="text-align:center;font-size:20px;margin-bottom:4px;">Extract Fans</h2>
+        <p style="text-align:center;color:#666;font-size:13px;margin-bottom:20px;">Routine Monitoring Data Collection Sheet</p>
+
+        <!-- SITE INFO -->
+        <div class="form-section">
+            <h3 class="section-title">Site Information</h3>
+            <div class="field-row">
+                <div class="field-group"><label>Name of Assessor <span class="required-star">*</span></label><input type="text" id="efAssessor" name="efAssessor"></div>
+                <div class="field-group"><label>Site Name <span class="required-star">*</span></label><input type="text" id="efSiteName" name="efSiteName"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Date <span class="required-star">*</span></label><input type="date" id="efDate" name="efDate"></div>
+            </div>
+        </div>
+
+        <!-- FAN DATA TABLE -->
+        <div class="form-section">
+            <h3 class="section-title">Fan Data</h3>
+            <div style="overflow-x:auto;">
+                <table id="efFanTable" style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr style="background:#004E8C;color:white;">
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:30px;">#</th>
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:100px;">Location</th>
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:60px;">Size</th>
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:80px;">Make</th>
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:80px;">Model</th>
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:60px;">Type</th>
+                            <th style="padding:8px 6px;text-align:center;font-size:11px;min-width:70px;">Working</th>
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:120px;">General Notes</th>
+                            <th style="padding:8px 6px;text-align:left;font-size:11px;min-width:120px;">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="efFanRows"></tbody>
+                </table>
+            </div>
+            <div style="margin-top:10px;">
+                <button type="button" class="btn btn-secondary" onclick="efAddRow()" style="font-size:12px;padding:6px 14px;">+ Add Row</button>
+                <button type="button" class="btn btn-secondary" onclick="efRemoveRow()" style="font-size:12px;padding:6px 14px;margin-left:6px;">- Remove Row</button>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+            <button type="button" class="btn btn-secondary" onclick="efClearForm()">Clear Form</button>
+            <button type="button" class="btn btn-primary" onclick="efGeneratePDF()">Download PDF</button>
+            <button type="button" class="btn btn-success" onclick="efGenerateAndEmail()">Generate PDF & Email</button>
+        </div>
+    </form>
+
 </div>
 
 <!-- ═══════════════════ SUCCESS PAGE ═══════════════════ -->
@@ -1170,10 +1227,12 @@ function openForm(formType) {
     document.getElementById('tmvForm').style.display = formType === 'tmv' ? '' : 'none';
     document.getElementById('gasForm').style.display = formType === 'gas' ? '' : 'none';
     document.getElementById('unventedForm').style.display = formType === 'unvented' ? '' : 'none';
+    document.getElementById('extractFanForm').style.display = formType === 'extractfan' ? '' : 'none';
     document.getElementById('validationMsg').style.display = 'none';
     if (formType === 'tmv') setDefaultSignDate();
     if (formType === 'gas') gasSetDefaultDate();
     if (formType === 'unvented') uvSetDefaultDate();
+    if (formType === 'extractfan') efSetDefaultDate();
 }
 function backToLanding() {
     activeFormType = '';
@@ -1182,6 +1241,7 @@ function backToLanding() {
     document.getElementById('tmvForm').style.display = 'none';
     document.getElementById('gasForm').style.display = 'none';
     document.getElementById('unventedForm').style.display = 'none';
+    document.getElementById('extractFanForm').style.display = 'none';
     document.getElementById('validationMsg').style.display = 'none';
 }
 
@@ -2633,6 +2693,321 @@ async function uvGenerateAndEmail() {
         console.error('Email error:', err);
         showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
         uvGeneratePDF();
+        showToast('PDF downloaded as fallback.', 'error');
+    }
+}
+
+// ══════════════════════════════════════════════════
+// EXTRACT FANS — Routine Monitoring Data Collection
+// ══════════════════════════════════════════════════
+
+let efRowCount = 0;
+function efAddRow() {
+    efRowCount++;
+    const n = efRowCount;
+    const tbody = document.getElementById('efFanRows');
+    const tr = document.createElement('tr');
+    tr.id = 'efRow' + n;
+    tr.style.borderBottom = '1px solid #eee';
+    tr.innerHTML = `
+        <td style="padding:4px 6px;font-weight:bold;color:#004E8C;">${n}</td>
+        <td style="padding:4px 2px;"><input type="text" id="efLoc${n}" name="efLoc${n}" style="width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;"></td>
+        <td style="padding:4px 2px;"><input type="text" id="efSize${n}" name="efSize${n}" style="width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;"></td>
+        <td style="padding:4px 2px;"><input type="text" id="efMake${n}" name="efMake${n}" style="width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;"></td>
+        <td style="padding:4px 2px;"><input type="text" id="efModel${n}" name="efModel${n}" style="width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;"></td>
+        <td style="padding:4px 2px;"><input type="text" id="efType${n}" name="efType${n}" style="width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;"></td>
+        <td style="padding:4px 2px;text-align:center;">
+            <label style="font-size:12px;margin-right:6px;"><input type="radio" name="efWorking${n}" value="yes"> Y</label>
+            <label style="font-size:12px;"><input type="radio" name="efWorking${n}" value="no"> N</label>
+        </td>
+        <td style="padding:4px 2px;"><input type="text" id="efNotes${n}" name="efNotes${n}" style="width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;"></td>
+        <td style="padding:4px 2px;"><input type="text" id="efRemarks${n}" name="efRemarks${n}" style="width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;"></td>
+    `;
+    tbody.appendChild(tr);
+}
+function efRemoveRow() {
+    if (efRowCount < 1) return;
+    const row = document.getElementById('efRow' + efRowCount);
+    if (row) row.remove();
+    efRowCount--;
+}
+
+function efSetDefaultDate() {
+    const el = document.getElementById('efDate');
+    if (el && !el.value) el.value = new Date().toISOString().slice(0, 10);
+    // Initialise with 15 rows
+    if (efRowCount === 0) { for (let i = 0; i < 15; i++) efAddRow(); }
+}
+
+function efClearForm() {
+    document.getElementById('extractFanForm').reset();
+    document.querySelectorAll('#extractFanForm .invalid').forEach(el => el.classList.remove('invalid'));
+    document.getElementById('validationMsg').style.display = 'none';
+    // Reset rows
+    document.getElementById('efFanRows').innerHTML = '';
+    efRowCount = 0;
+    for (let i = 0; i < 15; i++) efAddRow();
+    efSetDefaultDate();
+    showToast('Form cleared');
+}
+
+function efValidateForm() {
+    const errors = [];
+    document.querySelectorAll('#extractFanForm .invalid').forEach(el => el.classList.remove('invalid'));
+    function reqField(id, label) {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) { if (el) el.classList.add('invalid'); errors.push(label); }
+    }
+    reqField('efAssessor', 'Name of Assessor');
+    reqField('efSiteName', 'Site Name');
+    reqField('efDate', 'Date');
+
+    const msgEl = document.getElementById('validationMsg');
+    const listEl = document.getElementById('validationList');
+    if (errors.length > 0) {
+        listEl.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+        msgEl.style.display = 'block';
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    }
+    msgEl.style.display = 'none';
+    return true;
+}
+
+function efCollectFormData() {
+    const d = {
+        assessor: val('efAssessor'),
+        siteName: val('efSiteName'),
+        date: val('efDate'),
+        fans: []
+    };
+    for (let i = 1; i <= efRowCount; i++) {
+        const loc = val('efLoc' + i);
+        const size = val('efSize' + i);
+        const make = val('efMake' + i);
+        const model = val('efModel' + i);
+        const type = val('efType' + i);
+        const working = radio('efWorking' + i);
+        const notes = val('efNotes' + i);
+        const remarks = val('efRemarks' + i);
+        // Only include rows that have at least some data
+        if (loc || size || make || model || type || working || notes || remarks) {
+            d.fans.push({ num: i, location: loc, size, make, model, type, working, notes, remarks });
+        }
+    }
+    return d;
+}
+
+function efGeneratePDF(returnBlob = false) {
+    if (!returnBlob && !efValidateForm()) return;
+    const d = efCollectFormData();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4'); // Landscape
+    const pw = 297, ph = 210, ml = 10, mr = pw - 10, cw = mr - ml;
+    let y = 12;
+    const darkBg = [0, 78, 140];
+
+    // Title
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+    doc.text('Extract Fans', pw / 2, y, { align: 'center' });
+    y += 6;
+    doc.setFontSize(11); doc.setFont('helvetica', 'normal');
+    doc.text('Routine Monitoring Data Collection Sheet', pw / 2, y, { align: 'center' });
+    y += 4;
+    doc.setFontSize(8);
+    doc.text('DTA Electrical Mechanical', pw / 2, y, { align: 'center' });
+    y += 8;
+
+    // Site info row
+    doc.setFillColor(...darkBg); doc.rect(ml, y, cw, 7, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+    doc.text('SITE INFORMATION', ml + 3, y + 5); doc.setTextColor(0, 0, 0); y += 9;
+
+    const tw3 = cw / 3;
+    function fieldBox(x, yp, w, h, label, value) {
+        doc.setDrawColor(200); doc.rect(x, yp, w, h);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(120);
+        doc.text(label, x + 1.5, yp + 3.5); doc.setTextColor(0);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+        if (value) doc.text(String(value), x + 2, yp + h - 2);
+    }
+    fieldBox(ml, y, tw3, 9, 'Name of Assessor', d.assessor);
+    fieldBox(ml + tw3, y, tw3, 9, 'Site Name', d.siteName);
+    fieldBox(ml + tw3 * 2, y, tw3, 9, 'Date', formatDate(d.date));
+    y += 12;
+
+    // Table header
+    const cols = [
+        { label: '#', w: 10 },
+        { label: 'Location', w: 50 },
+        { label: 'Size', w: 25 },
+        { label: 'Make', w: 35 },
+        { label: 'Model', w: 35 },
+        { label: 'Type', w: 30 },
+        { label: 'Working', w: 20 },
+        { label: 'General Notes', w: 40 },
+        { label: 'Remarks', w: cw - 10 - 50 - 25 - 35 - 35 - 30 - 20 - 40 }
+    ];
+    const rowH = 7;
+    doc.setFillColor(...darkBg);
+    doc.rect(ml, y, cw, rowH, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+    let cx = ml;
+    cols.forEach(col => {
+        doc.text(col.label, cx + 2, y + 5);
+        cx += col.w;
+    });
+    doc.setTextColor(0, 0, 0);
+    y += rowH;
+
+    // Table rows
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+    const allRows = d.fans.length > 0 ? d.fans : [];
+    // Draw rows for all fans (or empty rows up to 15)
+    const totalRows = Math.max(allRows.length, 15);
+    for (let i = 0; i < totalRows; i++) {
+        if (y + rowH > ph - 10) {
+            doc.addPage('l');
+            y = 12;
+            // Repeat header
+            doc.setFillColor(...darkBg);
+            doc.rect(ml, y, cw, rowH, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
+            cx = ml;
+            cols.forEach(col => { doc.text(col.label, cx + 2, y + 5); cx += col.w; });
+            doc.setTextColor(0, 0, 0); y += rowH;
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+        }
+        const fan = allRows[i] || {};
+        const bgColor = i % 2 === 0 ? [255, 255, 255] : [245, 247, 250];
+        doc.setFillColor(...bgColor);
+        doc.rect(ml, y, cw, rowH, 'F');
+        doc.setDrawColor(220); doc.rect(ml, y, cw, rowH);
+
+        cx = ml;
+        const vals = [
+            String(fan.num || i + 1),
+            fan.location || '',
+            fan.size || '',
+            fan.make || '',
+            fan.model || '',
+            fan.type || '',
+            fan.working === 'yes' ? 'Y' : fan.working === 'no' ? 'N' : '',
+            fan.notes || '',
+            fan.remarks || ''
+        ];
+        cols.forEach((col, ci) => {
+            let txt = vals[ci];
+            if (ci === 6 && txt === 'N') { doc.setTextColor(220, 53, 69); }
+            doc.text(txt, cx + 2, y + 5);
+            if (ci === 6) doc.setTextColor(0, 0, 0);
+            cx += col.w;
+        });
+        y += rowH;
+    }
+
+    if (returnBlob) return doc.output('blob');
+    const filename = `Extract_Fans_${d.siteName || 'form'}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(filename);
+    showToast('PDF downloaded: ' + filename, 'success');
+}
+
+function efBuildEmailHTML(d) {
+    const dash = '&mdash;';
+    const v = (val) => val || dash;
+    const sh = (title) => `<div style="background:#004E8C;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">${title}</div>`;
+    const row = (l, val) => `<tr><td style="padding:6px 16px;border-bottom:1px solid #eee;color:#666;width:280px;">${l}</td><td style="padding:6px 16px;border-bottom:1px solid #eee;">${val}</td></tr>`;
+
+    let fanTable = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr style="background:#004E8C;color:white;">
+            <th style="padding:6px;text-align:left;">#</th>
+            <th style="padding:6px;text-align:left;">Location</th>
+            <th style="padding:6px;text-align:left;">Size</th>
+            <th style="padding:6px;text-align:left;">Make</th>
+            <th style="padding:6px;text-align:left;">Model</th>
+            <th style="padding:6px;text-align:left;">Type</th>
+            <th style="padding:6px;text-align:center;">Working</th>
+            <th style="padding:6px;text-align:left;">Notes</th>
+            <th style="padding:6px;text-align:left;">Remarks</th>
+        </tr>`;
+    d.fans.forEach((fan, i) => {
+        const bg = i % 2 === 0 ? '#fff' : '#f5f7fa';
+        const workingHtml = fan.working === 'yes' ? '<span style="color:#28a745;font-weight:bold">Y</span>' :
+            fan.working === 'no' ? '<span style="color:#dc3545;font-weight:bold">N</span>' : dash;
+        fanTable += `<tr style="background:${bg};">
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;font-weight:bold;color:#004E8C;">${fan.num}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(fan.location)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(fan.size)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(fan.make)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(fan.model)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(fan.type)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;text-align:center;">${workingHtml}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(fan.notes)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(fan.remarks)}</td>
+        </tr>`;
+    });
+    fanTable += '</table>';
+
+    return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:900px;margin:0 auto;color:#1a1a2e;">
+        <div style="background:#004E8C;color:white;padding:20px 24px;border-radius:8px 8px 0 0;">
+            <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0"><tr>
+                <td style="vertical-align:middle;width:80px;"><img src="https://dtaelectricalmechanical.co.uk/logo.png" alt="DTA" style="width:70px;height:auto;border-radius:6px;background:white;padding:4px;"></td>
+                <td style="vertical-align:middle;padding-left:16px;">
+                    <h1 style="margin:0;font-size:18px;color:white;">DTA Electrical Mechanical</h1>
+                    <p style="margin:4px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">Store Room, The Old Mill, Kinoulton Rd, Cropwell Bishop, Nottingham NG12 3BE</p>
+                    <p style="margin:2px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">admin@dtaelectricalmechanical.co.uk</p>
+                </td>
+            </tr></table>
+        </div>
+        <div style="background:#0072CE;color:white;padding:10px 24px;">
+            <h2 style="margin:0;font-size:15px;">Extract Fans</h2>
+            <p style="margin:2px 0 0;font-size:12px;opacity:0.85;">Routine Monitoring Data Collection Sheet</p>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Site Information')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Name of Assessor', '<strong>'+v(d.assessor)+'</strong>')}${row('Site Name', v(d.siteName))}${row('Date', formatDate(d.date) || dash)}
+            </table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Fan Data')}
+            <div style="padding:8px;overflow-x:auto;">${fanTable}</div>
+        </div>
+        <div style="text-align:center;padding:16px;font-size:11px;color:#999;">DTA Electrical Mechanical &mdash; Generated ${new Date().toLocaleDateString('en-GB')}</div>
+    </div>`;
+}
+
+async function efGenerateAndEmail() {
+    if (!efValidateForm()) return;
+    const recipientEmail = val('recipientEmail');
+    const publicKey = val('ejsPublicKey');
+    const serviceId = val('ejsServiceId');
+    const templateId = val('ejsTemplateId');
+    if (!recipientEmail) { showToast('Please enter a recipient email address', 'error'); return; }
+    if (!publicKey || !serviceId || !templateId) { showToast('Please configure EmailJS settings first', 'error'); return; }
+    if (!window.emailjs) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve, reject) => { script.onload = resolve; script.onerror = () => reject(new Error('Failed to load EmailJS')); });
+    }
+    try {
+        emailjs.init(publicKey);
+        const d = efCollectFormData();
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const subject = `Extract Fans Report - ${d.siteName || 'Unknown'} - ${dd}-${mm}-${yyyy}`;
+        await emailjs.send(serviceId, templateId, {
+            to_email: recipientEmail,
+            from_name: d.assessor || 'DTA Engineer',
+            subject: subject,
+            message_html: efBuildEmailHTML(d)
+        });
+        showSuccess(d.siteName, 'Extract Fans Report');
+    } catch (err) {
+        console.error('Email error:', err);
+        showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
+        efGeneratePDF();
         showToast('PDF downloaded as fallback.', 'error');
     }
 }
