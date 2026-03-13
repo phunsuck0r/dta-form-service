@@ -2736,7 +2736,7 @@ function efSetDefaultDate() {
     const el = document.getElementById('efDate');
     if (el && !el.value) el.value = new Date().toISOString().slice(0, 10);
     // Initialise with 15 rows
-    if (efRowCount === 0) { for (let i = 0; i < 15; i++) efAddRow(); }
+    if (efRowCount === 0) { for (let i = 0; i < 5; i++) efAddRow(); }
 }
 
 function efClearForm() {
@@ -2746,7 +2746,7 @@ function efClearForm() {
     // Reset rows
     document.getElementById('efFanRows').innerHTML = '';
     efRowCount = 0;
-    for (let i = 0; i < 15; i++) efAddRow();
+    for (let i = 0; i < 5; i++) efAddRow();
     efSetDefaultDate();
     showToast('Form cleared');
 }
