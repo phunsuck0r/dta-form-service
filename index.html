@@ -473,6 +473,11 @@
                 <h3>Extract Fans</h3>
                 <p>Routine Monitoring Data Collection Sheet</p>
             </div>
+            <div class="form-card" onclick="openForm('pat')">
+                <div class="card-icon">&#9889;</div>
+                <h3>PAT Testing</h3>
+                <p>Portable Appliance Testing Report</p>
+            </div>
         </div>
     </div>
 
@@ -1138,6 +1143,59 @@
         </div>
     </form>
 
+    <!-- ═══════════════════ PAT TESTING FORM ═══════════════════ -->
+    <form id="patForm" class="form-container" autocomplete="on" onsubmit="return false;" style="display:none;">
+        <h2 class="section-title" style="text-align:center;font-size:20px;margin-bottom:4px;">Portable Appliance Testing Report</h2>
+        <p style="text-align:center;color:#666;font-size:13px;margin-bottom:20px;">PAT Testing Report</p>
+
+        <!-- REPORT INFO -->
+        <div class="form-section">
+            <h3 class="section-title">Report Details</h3>
+            <div class="field-row">
+                <div class="field-group"><label>Report No. <span class="required-star">*</span></label><input type="text" id="patReportNo" name="patReportNo"></div>
+                <div class="field-group"><label>Site Name <span class="required-star">*</span></label><input type="text" id="patSiteName" name="patSiteName"></div>
+            </div>
+            <div class="field-row">
+                <div class="field-group"><label>Date of Test <span class="required-star">*</span></label><input type="date" id="patDateOfTest" name="patDateOfTest"></div>
+                <div class="field-group"><label>Engineer <span class="required-star">*</span></label><input type="text" id="patEngineer" name="patEngineer"></div>
+            </div>
+        </div>
+
+        <!-- APPLIANCE DATA TABLE -->
+        <div class="form-section">
+            <h3 class="section-title">Appliance Data</h3>
+            <div style="overflow-x:auto;">
+                <table id="patTable" style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <thead>
+                        <tr style="background:#004E8C;color:white;">
+                            <th style="padding:8px 4px;text-align:left;font-size:10px;min-width:45px;">ID No.</th>
+                            <th style="padding:8px 4px;text-align:left;font-size:10px;min-width:100px;">Appliance Description</th>
+                            <th style="padding:8px 4px;text-align:left;font-size:10px;min-width:80px;">Location</th>
+                            <th style="padding:8px 4px;text-align:center;font-size:10px;min-width:55px;">Visual Inspect</th>
+                            <th style="padding:8px 4px;text-align:left;font-size:10px;min-width:65px;">Earth Test (Ohms)</th>
+                            <th style="padding:8px 4px;text-align:left;font-size:10px;min-width:70px;">Insulation (MOhms)</th>
+                            <th style="padding:8px 4px;text-align:center;font-size:10px;min-width:60px;">Functional Check</th>
+                            <th style="padding:8px 4px;text-align:center;font-size:10px;min-width:60px;">Pass / Fail</th>
+                            <th style="padding:8px 4px;text-align:left;font-size:10px;min-width:100px;">Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patRows"></tbody>
+                </table>
+            </div>
+            <div style="margin-top:10px;">
+                <button type="button" class="btn btn-secondary" onclick="patAddRow()" style="font-size:12px;padding:6px 14px;">+ Add Row</button>
+                <button type="button" class="btn btn-secondary" onclick="patRemoveRow()" style="font-size:12px;padding:6px 14px;margin-left:6px;">- Remove Row</button>
+            </div>
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="actions">
+            <button type="button" class="btn btn-secondary" onclick="patClearForm()">Clear Form</button>
+            <button type="button" class="btn btn-primary" onclick="patGeneratePDF()">Download PDF</button>
+            <button type="button" class="btn btn-success" onclick="patGenerateAndEmail()">Generate PDF & Email</button>
+        </div>
+    </form>
+
 </div>
 
 <!-- ═══════════════════ SUCCESS PAGE ═══════════════════ -->
@@ -1228,11 +1286,13 @@ function openForm(formType) {
     document.getElementById('gasForm').style.display = formType === 'gas' ? '' : 'none';
     document.getElementById('unventedForm').style.display = formType === 'unvented' ? '' : 'none';
     document.getElementById('extractFanForm').style.display = formType === 'extractfan' ? '' : 'none';
+    document.getElementById('patForm').style.display = formType === 'pat' ? '' : 'none';
     document.getElementById('validationMsg').style.display = 'none';
     if (formType === 'tmv') setDefaultSignDate();
     if (formType === 'gas') gasSetDefaultDate();
     if (formType === 'unvented') uvSetDefaultDate();
     if (formType === 'extractfan') efSetDefaultDate();
+    if (formType === 'pat') patSetDefaultDate();
 }
 function backToLanding() {
     activeFormType = '';
@@ -1242,6 +1302,7 @@ function backToLanding() {
     document.getElementById('gasForm').style.display = 'none';
     document.getElementById('unventedForm').style.display = 'none';
     document.getElementById('extractFanForm').style.display = 'none';
+    document.getElementById('patForm').style.display = 'none';
     document.getElementById('validationMsg').style.display = 'none';
 }
 
@@ -3008,6 +3069,316 @@ async function efGenerateAndEmail() {
         console.error('Email error:', err);
         showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
         efGeneratePDF();
+        showToast('PDF downloaded as fallback.', 'error');
+    }
+}
+
+// ══════════════════════════════════════════════════
+// PAT TESTING — Portable Appliance Testing Report
+// ══════════════════════════════════════════════════
+
+let patRowCount = 0;
+function patAddRow() {
+    patRowCount++;
+    const n = patRowCount;
+    const tbody = document.getElementById('patRows');
+    const tr = document.createElement('tr');
+    tr.id = 'patRow' + n;
+    tr.style.borderBottom = '1px solid #eee';
+    const inputStyle = 'width:100%;padding:4px;font-size:12px;border:1px solid #ddd;border-radius:4px;';
+    tr.innerHTML = `
+        <td style="padding:4px 2px;"><input type="text" id="patId${n}" name="patId${n}" style="${inputStyle}"></td>
+        <td style="padding:4px 2px;"><input type="text" id="patDesc${n}" name="patDesc${n}" style="${inputStyle}"></td>
+        <td style="padding:4px 2px;"><input type="text" id="patLoc${n}" name="patLoc${n}" style="${inputStyle}"></td>
+        <td style="padding:4px 2px;text-align:center;">
+            <label style="font-size:11px;margin-right:4px;"><input type="radio" name="patVisual${n}" value="yes"> Y</label>
+            <label style="font-size:11px;"><input type="radio" name="patVisual${n}" value="no"> N</label>
+        </td>
+        <td style="padding:4px 2px;"><input type="text" id="patEarth${n}" name="patEarth${n}" style="${inputStyle}" placeholder="Ohms"></td>
+        <td style="padding:4px 2px;"><input type="text" id="patInsulation${n}" name="patInsulation${n}" style="${inputStyle}" placeholder="MOhms"></td>
+        <td style="padding:4px 2px;text-align:center;">
+            <label style="font-size:11px;margin-right:4px;"><input type="radio" name="patFunc${n}" value="yes"> Y</label>
+            <label style="font-size:11px;"><input type="radio" name="patFunc${n}" value="no"> N</label>
+        </td>
+        <td style="padding:4px 2px;text-align:center;">
+            <label style="font-size:11px;margin-right:4px;"><input type="radio" name="patResult${n}" value="pass"> P</label>
+            <label style="font-size:11px;"><input type="radio" name="patResult${n}" value="fail"> F</label>
+        </td>
+        <td style="padding:4px 2px;"><input type="text" id="patComment${n}" name="patComment${n}" style="${inputStyle}"></td>
+    `;
+    tbody.appendChild(tr);
+}
+function patRemoveRow() {
+    if (patRowCount < 1) return;
+    const row = document.getElementById('patRow' + patRowCount);
+    if (row) row.remove();
+    patRowCount--;
+}
+
+function patSetDefaultDate() {
+    const el = document.getElementById('patDateOfTest');
+    if (el && !el.value) el.value = new Date().toISOString().slice(0, 10);
+    if (patRowCount === 0) { for (let i = 0; i < 5; i++) patAddRow(); }
+}
+
+function patClearForm() {
+    document.getElementById('patForm').reset();
+    document.querySelectorAll('#patForm .invalid').forEach(el => el.classList.remove('invalid'));
+    document.getElementById('validationMsg').style.display = 'none';
+    document.getElementById('patRows').innerHTML = '';
+    patRowCount = 0;
+    for (let i = 0; i < 5; i++) patAddRow();
+    patSetDefaultDate();
+    showToast('Form cleared');
+}
+
+function patValidateForm() {
+    const errors = [];
+    document.querySelectorAll('#patForm .invalid').forEach(el => el.classList.remove('invalid'));
+    function reqField(id, label) {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) { if (el) el.classList.add('invalid'); errors.push(label); }
+    }
+    reqField('patReportNo', 'Report No.');
+    reqField('patSiteName', 'Site Name');
+    reqField('patDateOfTest', 'Date of Test');
+    reqField('patEngineer', 'Engineer');
+
+    const msgEl = document.getElementById('validationMsg');
+    const listEl = document.getElementById('validationList');
+    if (errors.length > 0) {
+        listEl.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
+        msgEl.style.display = 'block';
+        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+    }
+    msgEl.style.display = 'none';
+    return true;
+}
+
+function patCollectFormData() {
+    const d = {
+        reportNo: val('patReportNo'),
+        siteName: val('patSiteName'),
+        dateOfTest: val('patDateOfTest'),
+        engineer: val('patEngineer'),
+        appliances: []
+    };
+    for (let i = 1; i <= patRowCount; i++) {
+        const id = val('patId' + i);
+        const desc = val('patDesc' + i);
+        const loc = val('patLoc' + i);
+        const visual = radio('patVisual' + i);
+        const earth = val('patEarth' + i);
+        const insulation = val('patInsulation' + i);
+        const func = radio('patFunc' + i);
+        const result = radio('patResult' + i);
+        const comment = val('patComment' + i);
+        if (id || desc || loc || visual || earth || insulation || func || result || comment) {
+            d.appliances.push({ num: i, id, desc, loc, visual, earth, insulation, func, result, comment });
+        }
+    }
+    return d;
+}
+
+function patGeneratePDF(returnBlob = false) {
+    if (!returnBlob && !patValidateForm()) return;
+    const d = patCollectFormData();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4'); // Landscape
+    const pw = 297, ph = 210, ml = 10, mr = pw - 10, cw = mr - ml;
+    let y = 12;
+    const darkBg = [0, 78, 140];
+
+    // Title
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(16);
+    doc.text('PORTABLE APPLIANCE TESTING REPORT', pw / 2, y, { align: 'center' });
+    y += 5;
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text('DTA Electrical Mechanical', pw / 2, y, { align: 'center' });
+    y += 8;
+
+    // Report info
+    doc.setFillColor(...darkBg); doc.rect(ml, y, cw, 7, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+    doc.text('REPORT DETAILS', ml + 3, y + 5); doc.setTextColor(0, 0, 0); y += 9;
+
+    const qw = cw / 4;
+    function fieldBox(x, yp, w, h, label, value) {
+        doc.setDrawColor(200); doc.rect(x, yp, w, h);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(120);
+        doc.text(label, x + 1.5, yp + 3.5); doc.setTextColor(0);
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+        if (value) doc.text(String(value), x + 2, yp + h - 2);
+    }
+    fieldBox(ml, y, qw, 9, 'Report No.', d.reportNo);
+    fieldBox(ml + qw, y, qw, 9, 'Site Name', d.siteName);
+    fieldBox(ml + qw * 2, y, qw, 9, 'Date of Test', formatDate(d.dateOfTest));
+    fieldBox(ml + qw * 3, y, qw, 9, 'Engineer', d.engineer);
+    y += 12;
+
+    // Table
+    const cols = [
+        { label: 'ID No.', w: 20 },
+        { label: 'Appliance Description', w: 55 },
+        { label: 'Location', w: 40 },
+        { label: 'Visual', w: 18 },
+        { label: 'Earth (Ohms)', w: 28 },
+        { label: 'Insulation (MOhms)', w: 32 },
+        { label: 'Func. Check', w: 22 },
+        { label: 'Pass/Fail', w: 20 },
+        { label: 'Comments', w: cw - 20 - 55 - 40 - 18 - 28 - 32 - 22 - 20 }
+    ];
+    const rowH = 7;
+
+    function drawTableHeader() {
+        doc.setFillColor(...darkBg);
+        doc.rect(ml, y, cw, rowH, 'F');
+        doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+        let cx = ml;
+        cols.forEach(col => { doc.text(col.label, cx + 1.5, y + 5); cx += col.w; });
+        doc.setTextColor(0, 0, 0); y += rowH;
+    }
+    drawTableHeader();
+
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+    const allRows = d.appliances.length > 0 ? d.appliances : [];
+    const totalRows = Math.max(allRows.length, 5);
+    for (let i = 0; i < totalRows; i++) {
+        if (y + rowH > ph - 10) {
+            doc.addPage('l'); y = 12;
+            drawTableHeader();
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(7);
+        }
+        const a = allRows[i] || {};
+        const bgColor = i % 2 === 0 ? [255, 255, 255] : [245, 247, 250];
+        doc.setFillColor(...bgColor);
+        doc.rect(ml, y, cw, rowH, 'F');
+        doc.setDrawColor(220); doc.rect(ml, y, cw, rowH);
+
+        let cx = ml;
+        const ynVal = (v) => v === 'yes' ? 'Y' : v === 'no' ? 'N' : '';
+        const pfVal = (v) => v === 'pass' ? 'PASS' : v === 'fail' ? 'FAIL' : '';
+        const vals = [
+            a.id || '', a.desc || '', a.loc || '', ynVal(a.visual),
+            a.earth || '', a.insulation || '', ynVal(a.func), pfVal(a.result), a.comment || ''
+        ];
+        cols.forEach((col, ci) => {
+            let txt = vals[ci];
+            if (ci === 7 && txt === 'FAIL') doc.setTextColor(220, 53, 69);
+            if (ci === 7 && txt === 'PASS') doc.setTextColor(40, 167, 69);
+            if (ci === 3 && txt === 'N') doc.setTextColor(220, 53, 69);
+            if (ci === 6 && txt === 'N') doc.setTextColor(220, 53, 69);
+            doc.text(txt, cx + 1.5, y + 5);
+            doc.setTextColor(0, 0, 0);
+            cx += col.w;
+        });
+        y += rowH;
+    }
+
+    if (returnBlob) return doc.output('blob');
+    const filename = `PAT_Report_${d.siteName || 'form'}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(filename);
+    showToast('PDF downloaded: ' + filename, 'success');
+}
+
+function patBuildEmailHTML(d) {
+    const dash = '&mdash;';
+    const v = (val) => val || dash;
+    const sh = (title) => `<div style="background:#004E8C;color:white;padding:8px 16px;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:0.5px;">${title}</div>`;
+    const row = (l, val) => `<tr><td style="padding:6px 16px;border-bottom:1px solid #eee;color:#666;width:280px;">${l}</td><td style="padding:6px 16px;border-bottom:1px solid #eee;">${val}</td></tr>`;
+    const ynHtml = (v) => v === 'yes' ? '<span style="color:#28a745;font-weight:bold">Y</span>' : v === 'no' ? '<span style="color:#dc3545;font-weight:bold">N</span>' : dash;
+    const pfHtml = (v) => v === 'pass' ? '<span style="color:#28a745;font-weight:bold">PASS</span>' : v === 'fail' ? '<span style="color:#dc3545;font-weight:bold">FAIL</span>' : dash;
+
+    let appTable = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr style="background:#004E8C;color:white;">
+            <th style="padding:6px;text-align:left;">ID</th>
+            <th style="padding:6px;text-align:left;">Description</th>
+            <th style="padding:6px;text-align:left;">Location</th>
+            <th style="padding:6px;text-align:center;">Visual</th>
+            <th style="padding:6px;text-align:left;">Earth</th>
+            <th style="padding:6px;text-align:left;">Insulation</th>
+            <th style="padding:6px;text-align:center;">Func.</th>
+            <th style="padding:6px;text-align:center;">Result</th>
+            <th style="padding:6px;text-align:left;">Comments</th>
+        </tr>`;
+    d.appliances.forEach((a, i) => {
+        const bg = i % 2 === 0 ? '#fff' : '#f5f7fa';
+        appTable += `<tr style="background:${bg};">
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;font-weight:bold;color:#004E8C;">${v(a.id)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(a.desc)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(a.loc)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;text-align:center;">${ynHtml(a.visual)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(a.earth)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(a.insulation)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;text-align:center;">${ynHtml(a.func)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;text-align:center;">${pfHtml(a.result)}</td>
+            <td style="padding:5px 6px;border-bottom:1px solid #eee;">${v(a.comment)}</td>
+        </tr>`;
+    });
+    appTable += '</table>';
+
+    return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:900px;margin:0 auto;color:#1a1a2e;">
+        <div style="background:#004E8C;color:white;padding:20px 24px;border-radius:8px 8px 0 0;">
+            <table style="width:100%;border-collapse:collapse;" cellpadding="0" cellspacing="0"><tr>
+                <td style="vertical-align:middle;width:80px;"><img src="https://dtaelectricalmechanical.co.uk/logo.png" alt="DTA" style="width:70px;height:auto;border-radius:6px;background:white;padding:4px;"></td>
+                <td style="vertical-align:middle;padding-left:16px;">
+                    <h1 style="margin:0;font-size:18px;color:white;">DTA Electrical Mechanical</h1>
+                    <p style="margin:4px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">Store Room, The Old Mill, Kinoulton Rd, Cropwell Bishop, Nottingham NG12 3BE</p>
+                    <p style="margin:2px 0 0;font-size:11px;color:rgba(255,255,255,0.75);">admin@dtaelectricalmechanical.co.uk</p>
+                </td>
+            </tr></table>
+        </div>
+        <div style="background:#0072CE;color:white;padding:10px 24px;">
+            <h2 style="margin:0;font-size:15px;">Portable Appliance Testing Report</h2>
+            <p style="margin:2px 0 0;font-size:12px;opacity:0.85;">PAT Testing Report</p>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Report Details')}
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                ${row('Report No.', '<strong>'+v(d.reportNo)+'</strong>')}${row('Site Name', v(d.siteName))}
+                ${row('Date of Test', formatDate(d.dateOfTest) || dash)}${row('Engineer', v(d.engineer))}
+            </table>
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;">${sh('Appliance Data')}
+            <div style="padding:8px;overflow-x:auto;">${appTable}</div>
+        </div>
+        <div style="text-align:center;padding:16px;font-size:11px;color:#999;">DTA Electrical Mechanical &mdash; Generated ${new Date().toLocaleDateString('en-GB')}</div>
+    </div>`;
+}
+
+async function patGenerateAndEmail() {
+    if (!patValidateForm()) return;
+    const recipientEmail = val('recipientEmail');
+    const publicKey = val('ejsPublicKey');
+    const serviceId = val('ejsServiceId');
+    const templateId = val('ejsTemplateId');
+    if (!recipientEmail) { showToast('Please enter a recipient email address', 'error'); return; }
+    if (!publicKey || !serviceId || !templateId) { showToast('Please configure EmailJS settings first', 'error'); return; }
+    if (!window.emailjs) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+        document.head.appendChild(script);
+        await new Promise((resolve, reject) => { script.onload = resolve; script.onerror = () => reject(new Error('Failed to load EmailJS')); });
+    }
+    try {
+        emailjs.init(publicKey);
+        const d = patCollectFormData();
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        const subject = `PAT Testing Report - ${d.siteName || 'Unknown'} - ${dd}-${mm}-${yyyy}`;
+        await emailjs.send(serviceId, templateId, {
+            to_email: recipientEmail,
+            from_name: d.engineer || 'DTA Engineer',
+            subject: subject,
+            message_html: patBuildEmailHTML(d)
+        });
+        showSuccess(d.siteName, 'PAT Testing Report');
+    } catch (err) {
+        console.error('Email error:', err);
+        showToast('Email failed: ' + (err.text || err.message || 'Unknown error'), 'error');
+        patGeneratePDF();
         showToast('PDF downloaded as fallback.', 'error');
     }
 }
