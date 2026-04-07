@@ -1152,11 +1152,10 @@
         <div class="form-section">
             <h3 class="section-title">Report Details</h3>
             <div class="field-row">
-                <div class="field-group"><label>Report No. <span class="required-star">*</span></label><input type="text" id="patReportNo" name="patReportNo"></div>
                 <div class="field-group"><label>Site Name <span class="required-star">*</span></label><input type="text" id="patSiteName" name="patSiteName"></div>
+                <div class="field-group"><label>Date of Test <span class="required-star">*</span></label><input type="date" id="patDateOfTest" name="patDateOfTest"></div>
             </div>
             <div class="field-row">
-                <div class="field-group"><label>Date of Test <span class="required-star">*</span></label><input type="date" id="patDateOfTest" name="patDateOfTest"></div>
                 <div class="field-group"><label>Engineer <span class="required-star">*</span></label><input type="text" id="patEngineer" name="patEngineer"></div>
             </div>
         </div>
@@ -3139,7 +3138,6 @@ function patValidateForm() {
         const el = document.getElementById(id);
         if (!el || !el.value.trim()) { if (el) el.classList.add('invalid'); errors.push(label); }
     }
-    reqField('patReportNo', 'Report No.');
     reqField('patSiteName', 'Site Name');
     reqField('patDateOfTest', 'Date of Test');
     reqField('patEngineer', 'Engineer');
@@ -3158,7 +3156,6 @@ function patValidateForm() {
 
 function patCollectFormData() {
     const d = {
-        reportNo: val('patReportNo'),
         siteName: val('patSiteName'),
         dateOfTest: val('patDateOfTest'),
         engineer: val('patEngineer'),
@@ -3203,7 +3200,7 @@ function patGeneratePDF(returnBlob = false) {
     doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
     doc.text('REPORT DETAILS', ml + 3, y + 5); doc.setTextColor(0, 0, 0); y += 9;
 
-    const qw = cw / 4;
+    const qw = cw / 3;
     function fieldBox(x, yp, w, h, label, value) {
         doc.setDrawColor(200); doc.rect(x, yp, w, h);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(120);
@@ -3211,10 +3208,9 @@ function patGeneratePDF(returnBlob = false) {
         doc.setFontSize(9); doc.setFont('helvetica', 'normal');
         if (value) doc.text(String(value), x + 2, yp + h - 2);
     }
-    fieldBox(ml, y, qw, 9, 'Report No.', d.reportNo);
-    fieldBox(ml + qw, y, qw, 9, 'Site Name', d.siteName);
-    fieldBox(ml + qw * 2, y, qw, 9, 'Date of Test', formatDate(d.dateOfTest));
-    fieldBox(ml + qw * 3, y, qw, 9, 'Engineer', d.engineer);
+    fieldBox(ml, y, qw, 9, 'Site Name', d.siteName);
+    fieldBox(ml + qw, y, qw, 9, 'Date of Test', formatDate(d.dateOfTest));
+    fieldBox(ml + qw * 2, y, qw, 9, 'Engineer', d.engineer);
     y += 12;
 
     // Table
@@ -3335,8 +3331,8 @@ function patBuildEmailHTML(d) {
         </div>
         <div style="border:1px solid #ddd;border-top:none;">${sh('Report Details')}
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                ${row('Report No.', '<strong>'+v(d.reportNo)+'</strong>')}${row('Site Name', v(d.siteName))}
-                ${row('Date of Test', formatDate(d.dateOfTest) || dash)}${row('Engineer', v(d.engineer))}
+                ${row('Site Name', '<strong>'+v(d.siteName)+'</strong>')}${row('Date of Test', formatDate(d.dateOfTest) || dash)}
+                ${row('Engineer', v(d.engineer))}
             </table>
         </div>
         <div style="border:1px solid #ddd;border-top:none;">${sh('Appliance Data')}
